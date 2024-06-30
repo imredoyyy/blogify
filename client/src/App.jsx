@@ -1,14 +1,18 @@
 import { ThemeProvider } from "./provider/provider";
 import { Routes, Route } from "react-router-dom";
 
-import Home from "./page/home";
-import Dashboard from "./page/dashboard";
-import SignUp from "./page/sign-up";
-import SignIn from "./page/sign-in";
+// Pages
+import Home from "./pages/home";
+import Dashboard from "./pages/dashboard";
+import SignUp from "./pages/sign-up";
+import SignIn from "./pages/sign-in";
+
+import { Header } from "./components/header";
 
 const App = () => {
   return (
     <ThemeProvider>
+      <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
