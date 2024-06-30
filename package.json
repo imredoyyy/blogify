@@ -1,4 +1,11 @@
 {
+  "name": "blogify",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "bun --watch api/server.js",
+    "start": "bun api/server.js"
+  },
+  "type": "module",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
