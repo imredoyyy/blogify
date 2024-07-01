@@ -2,8 +2,9 @@ import bcrypt from "bcryptjs";
 import User from "../models/user";
 
 import { userExists } from "../utils/user-exists";
+import { errorHandler } from "../utils/error-handler";
 
-export const signUp = async (req, res) => {
+export const signUp = async (req, res, next) => {
   // Get user data from request body
   const { name, email, password } = req.body;
 
@@ -17,7 +18,7 @@ export const signUp = async (req, res) => {
       email === "" ||
       password === ""
     ) {
-      return res.status(400).json({ message: "All fields are required" });
+      next(errorHandler(400, "All fields are required"));
     }
 
     // Check if user already exists
@@ -25,16 +26,12 @@ export const signUp = async (req, res) => {
 
     // If user already exists, return error
     if (existingUser) {
-      return res
-        .status(409)
-        .json({ message: "User with this email already exists" });
+      next(errorHandler(409, "User with this email already exists"));
     }
 
     // Check if password is at least 8 characters long
     if (password.length < 8) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 8 characters long" });
+      next(errorHandler(400, "Password must be at least 8 characters long"));
     }
 
     // Hash password
@@ -54,6 +51,6 @@ export const signUp = async (req, res) => {
     // Return success message
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
