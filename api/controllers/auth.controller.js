@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import User from "../models/user";
 
 import { userExists } from "../utils/user-exists";
@@ -12,14 +13,7 @@ export const signUp = async (req, res, next) => {
 
   try {
     // Check if all fields are filled
-    if (
-      !name ||
-      !email ||
-      !password ||
-      name === "" ||
-      email === "" ||
-      password === ""
-    ) {
+    if (!name || !email || !password) {
       next(errorHandler(400, "All fields are required"));
     }
 
@@ -52,6 +46,47 @@ export const signUp = async (req, res, next) => {
 
     // Return success message
     res.status(201).json({ message: "User created successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signIn = async (req, res, next) => {
+  const email = req.body.email ? req.body.email.trim() : "";
+  const password = req.body.password ? req.body.password.trim() : "";
+
+  try {
+    if (!email || !password) {
+      next(errorHandler(400, "All fields are required"));
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      next(errorHandler(404, "User not found"));
+    }
+
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return next(errorHandler(401, "Invalid credentials"));
+    }
+
+    // Generate JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15d",
+    });
+
+    // Remove password from response
+    const { password: userPassword, ...rest } = user._doc;
+
+    // Send response
+    res
+      .status(200)
+      .cookie("accessToken", token, { httpOnly: true })
+      .json({ ...rest, message: "Login successful" });
   } catch (error) {
     next(error);
   }

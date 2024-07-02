@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { cn } from "../lib/utils";
+import { Link } from "react-router-dom";
 
 const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
   const form = useForm({
@@ -24,9 +25,9 @@ const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
     // Trim whitespace and replace multiple spaces with a single space
     const trimmedData = {
       ...data,
-      name: data.name ? data.name.trim().replace(/\s+/g, " ") : "",
-      email: data.email ? data.email.trim().replace(/\s+/g, " ") : "",
-      password: data.password ? data.password.trim() : "",
+      name: data?.name?.trim().replace(/\s+/g, " "),
+      email: data?.email?.trim().replace(/\s+/g, " "),
+      password: data?.password?.trim(),
     };
 
     try {
@@ -64,6 +65,7 @@ const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
                       <Input
                         type="text"
                         disabled={disabled}
+                        required
                         placeholder="John Doe"
                         {...field}
                       />
@@ -82,6 +84,7 @@ const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
                     <Input
                       type="email"
                       disabled={disabled}
+                      required
                       placeholder="johndoe@email.com"
                       {...field}
                     />
@@ -100,6 +103,7 @@ const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
                       disabled={disabled}
                       type={passwordType}
                       placeholder="Password"
+                      required
                       autoComplete={
                         signUp ? "new-password" : "current-password"
                       }
@@ -135,6 +139,17 @@ const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
             </Button>
           </form>
         </Form>
+        <div className="mt-5 flex items-center justify-center gap-2">
+          <p className="text-sm text-muted-foreground">
+            {signUp ? "Already have an account?" : "Don't have an account?"}
+          </p>
+          <Link
+            to={signUp ? "/sign-in" : "/sign-up"}
+            className="active:[#7e8ca0] text-sm font-medium transition-colors duration-200 md:hover:text-[#7e8ca0]"
+          >
+            {signUp ? "Sign In" : "Sign Up"}
+          </Link>
+        </div>
       </div>
     </div>
   );

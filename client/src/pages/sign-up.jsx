@@ -7,23 +7,23 @@ import { Container } from "../components/container";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [loggingIn, setLoggingIn] = useState(false);
+  const [accountCreating, setAccountCreating] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
 
   const handleFormSubmit = async (data) => {
-    setLoggingIn(true);
+    setAccountCreating(true);
     setAccountCreated(false);
 
     try {
       if (!data.name || !data.email || !data.password) {
-        setLoggingIn(false);
+        setAccountCreating(false);
         setAccountCreated(false);
         toast.error("All fields are required");
         return;
       }
 
       if (data.password.length < 8) {
-        setLoggingIn(false);
+        setAccountCreating(false);
         setAccountCreated(false);
         toast.error("Password must be at least 8 characters long");
         return;
@@ -38,7 +38,7 @@ const SignUp = () => {
       });
 
       if (!response.ok) {
-        setLoggingIn(false);
+        setAccountCreating(false);
         setAccountCreated(false);
 
         switch (response.status) {
@@ -52,12 +52,12 @@ const SignUp = () => {
         return;
       }
 
-      setLoggingIn(false);
+      setAccountCreating(false);
       setAccountCreated(true);
       toast.success("Account created successfully. Please sign in.");
       navigate("/sign-in");
     } catch (error) {
-      setLoggingIn(false);
+      setAccountCreating(false);
       setAccountCreated(false);
       toast.error("Something went wrong. Please try again.");
     }
@@ -70,7 +70,7 @@ const SignUp = () => {
           signUp={true}
           onSubmit={handleFormSubmit}
           defaultValues={{ name: "", email: "", password: "" }}
-          disabled={loggingIn}
+          disabled={accountCreating}
           success={accountCreated}
         />
       </div>
