@@ -5,10 +5,8 @@ import { userExists } from "../utils/user-exists";
 import { errorHandler } from "../utils/error-handler";
 
 export const signUp = async (req, res, next) => {
-  // Get user data from request body and trim whitespace
-  const name = req.body.name ? req.body.name.trim() : "";
-  const email = req.body.email ? req.body.email.trim() : "";
-  const password = req.body.password ? req.body.password.trim() : "";
+  // Get user data from request body
+  const { name, email, password } = req.body;
 
   try {
     // Check if all fields are filled
