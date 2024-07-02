@@ -1,5 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/user-slice";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Container } from "../components/container";
 import AuthForm from "../components/auth-form";
@@ -7,16 +13,17 @@ import { toast } from "sonner";
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const [loggingIn, setLoggingIn] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const { loading } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const handleFormSubmit = async (data) => {
-    setLoggingIn(true);
+    dispatch(signInStart());
 
     try {
       if (!data.email || !data.password) {
-        setLoggingIn(false);
         toast.error("All fields are required");
+        dispatch(signInFailure("All fields are required"));
         return;
       }
 
@@ -29,7 +36,7 @@ const SignIn = () => {
       });
 
       if (!response.ok) {
-        setLoggingIn(false);
+        dispatch(signInFailure());
 
         switch (response.status) {
           case 404:
@@ -46,14 +53,15 @@ const SignIn = () => {
         return;
       }
 
-      setLoggingIn(false);
+      const userData = await response.json();
+
+      dispatch(signInSuccess(userData));
       setLoggedIn(true);
       toast.success("Logged in successfully");
       navigate("/");
     } catch (error) {
-      setLoggingIn(false);
       setLoggedIn(false);
-      console.error(error);
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -63,7 +71,7 @@ const SignIn = () => {
         <AuthForm
           onSubmit={handleFormSubmit}
           defaultValues={{ email: "", password: "" }}
-          disabled={loggingIn}
+          disabled={loading}
           success={loggedIn}
         />
       </div>

@@ -65,7 +65,7 @@ const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
                       <Input
                         type="text"
                         disabled={disabled}
-                        required
+                        aria-required="true"
                         placeholder="John Doe"
                         {...field}
                       />
@@ -84,8 +84,9 @@ const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
                     <Input
                       type="email"
                       disabled={disabled}
-                      required
+                      aria-required="true"
                       placeholder="johndoe@email.com"
+                      autoComplete="username"
                       {...field}
                     />
                   </FormControl>
@@ -103,7 +104,7 @@ const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
                       disabled={disabled}
                       type={passwordType}
                       placeholder="Password"
-                      required
+                      aria-required="true"
                       autoComplete={
                         signUp ? "new-password" : "current-password"
                       }
