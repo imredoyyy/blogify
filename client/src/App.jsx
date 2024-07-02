@@ -1,5 +1,6 @@
 import { ThemeProvider } from "./provider/provider";
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "./components/ui/sonner";
 
 // Pages
 import Home from "./pages/home";
@@ -12,6 +13,7 @@ import { Header } from "./components/header";
 const App = () => {
   return (
     <ThemeProvider>
+      <Toaster />
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
