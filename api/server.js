@@ -6,7 +6,7 @@ import authRoute from "./routes/auth.route";
 
 const app = express();
 app.use(express.json());
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 connectToDb();
 
 app
@@ -17,16 +17,14 @@ app
   .use("/api/auth", authRoute);
 
 app.use((err, req, res, next) => {
-  if (err) {
-    const statusCode = err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
 
-    res.status(statusCode).json({
-      success: false,
-      statusCode,
-      message,
-    });
-  }
+  res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message,
+  });
 });
 
 app.listen(PORT, () => {
