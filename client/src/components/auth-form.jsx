@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 
 import { Form, FormControl, FormField, FormItem } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { cn } from "../lib/utils";
-import { Link } from "react-router-dom";
+import { GoogleAuthButton } from "./google-auth-button";
 
 const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
   const form = useForm({
@@ -49,7 +50,14 @@ const AuthForm = ({ disabled, signUp, onSubmit, defaultValues, success }) => {
             : "Welcome back! Please sign in to continue"}
         </p>
       </div>
-      <div className="mx-auto w-full max-w-96">
+      <div className="mx-auto w-full max-w-96 space-y-6">
+        <GoogleAuthButton />
+        <div className="flex items-center justify-between gap-2">
+          <div className="h-px w-full rounded-md bg-muted-foreground/30"></div>
+          <p className="text-sm text-muted-foreground">or</p>
+          <div className="h-px w-full rounded-md bg-muted-foreground/30"></div>
+        </div>
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
