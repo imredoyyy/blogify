@@ -8,9 +8,11 @@ import { Button } from "./ui/button";
 import { Menu } from "lucide-react";
 import { ThemeToggle } from "../lib/theme-toggle";
 import { NavButton } from "./nav-button";
+import { useIsAuthenticated } from "../utils/is-authenticated";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const isAuthenticated = useIsAuthenticated();
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -33,16 +35,19 @@ export const Navbar = () => {
 
         <SheetContent side="left" className="flex flex-col gap-y-6 px-2">
           <nav className="flex flex-col gap-y-2 pt-6">
-            {routes.map((route, i) => (
-              <Button
-                key={i}
-                variant={route.href === pathname ? "secondary" : "ghost"}
-                onClick={() => handleRoute(route.href)}
-                className="w-full justify-start"
-              >
-                {route.label}
-              </Button>
-            ))}
+            {routes.map(
+              (route, i) =>
+                (!route.notAuthenticatedOnly || !isAuthenticated) && (
+                  <Button
+                    key={i}
+                    variant={route.href === pathname ? "secondary" : "ghost"}
+                    onClick={() => handleRoute(route.href)}
+                    className="w-full justify-start"
+                  >
+                    {route.label}
+                  </Button>
+                ),
+            )}
           </nav>
           <div className="flex items-center justify-between">
             <p>Switch Theme</p>
@@ -55,9 +60,15 @@ export const Navbar = () => {
 
   return (
     <nav className="hidden items-center gap-x-4 md:flex">
-      {routes.map((route, i) => (
-        <NavButton key={i} href={route.href} label={route.label} />
-      ))}
+      {routes.map(
+        (route, i) =>
+          // Render the NavButton if:
+          // 1. The route is not restricted to unauthenticated users (notAuthenticatedOnly is false or undefined)
+          // 2. OR if it is restricted (notAuthenticatedOnly is true) and the user is not authenticated
+          (!route.notAuthenticatedOnly || !isAuthenticated) && (
+            <NavButton key={i} href={route.href} label={route.label} />
+          ),
+      )}
     </nav>
   );
 };

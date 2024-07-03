@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import AuthForm from "../components/auth-form";
 import { Container } from "../components/container";
+import { useIsAuthenticated } from "../utils/is-authenticated";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [accountCreating, setAccountCreating] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
+  const isAuthenticated = useIsAuthenticated();
+
+  // If user is logged in redirect them to home page
+  if (isAuthenticated) return <Navigate to="/" />;
 
   const handleFormSubmit = async (data) => {
     setAccountCreating(true);

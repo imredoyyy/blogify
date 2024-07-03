@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import {
   signInStart,
   signInSuccess,
   signInFailure,
 } from "../redux/user/user-slice";
-import { useDispatch } from "react-redux";
 
 import { Container } from "../components/container";
 import AuthForm from "../components/auth-form";
 import { toast } from "sonner";
+import { useIsAuthenticated } from "../utils/is-authenticated";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -69,6 +70,11 @@ const SignIn = () => {
       dispatch(signInFailure(error.message));
     }
   };
+
+  const isAuthenticated = useIsAuthenticated();
+
+  // If user is logged in redirect them to home page
+  if (isAuthenticated) return <Navigate to="/" />;
 
   return (
     <Container>

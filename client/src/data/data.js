@@ -6,6 +6,7 @@ export const routes = [
   {
     label: "Sign In",
     href: "/sign-in",
+    notAuthenticatedOnly: true,
   },
   {
     label: "About",
