@@ -43,7 +43,7 @@ const SignUp = () => {
 
         switch (response.status) {
           case 409:
-            toast.error("User with this email already exists");
+            toast.error("User with this email already exists.");
             break;
           default:
             toast.error("Something went wrong. Please try again.");

@@ -5,7 +5,7 @@ import {
   signInSuccess,
   signInFailure,
 } from "../redux/user/user-slice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { Container } from "../components/container";
 import AuthForm from "../components/auth-form";
@@ -14,16 +14,18 @@ import { toast } from "sonner";
 const SignIn = () => {
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState(false);
-  const { loading } = useSelector((state) => state.user);
+  const [loggingIn, setLoggingIn] = useState(false);
   const dispatch = useDispatch();
 
   const handleFormSubmit = async (data) => {
     dispatch(signInStart());
+    setLoggingIn(true);
 
     try {
       if (!data.email || !data.password) {
         toast.error("All fields are required");
         dispatch(signInFailure("All fields are required"));
+        setLoggingIn(false);
         return;
       }
 
@@ -37,16 +39,17 @@ const SignIn = () => {
 
       if (!response.ok) {
         dispatch(signInFailure());
+        setLoggingIn(false);
 
         switch (response.status) {
           case 404:
-            toast.error("User with this email was not found!");
+            toast.error("User not found! Please sign up.");
             break;
           case 401:
             toast.error("Invalid password!");
             break;
           default:
-            toast.error("Something went wrong. Please try again");
+            toast.error("Something went wrong! Please try again.");
             break;
         }
 
@@ -57,10 +60,12 @@ const SignIn = () => {
 
       dispatch(signInSuccess(userData));
       setLoggedIn(true);
-      toast.success("Logged in successfully");
+      toast.success("Sign in successful.");
+      setLoggingIn(false);
       navigate("/");
     } catch (error) {
       setLoggedIn(false);
+      setLoggingIn(false);
       dispatch(signInFailure(error.message));
     }
   };
@@ -71,7 +76,7 @@ const SignIn = () => {
         <AuthForm
           onSubmit={handleFormSubmit}
           defaultValues={{ email: "", password: "" }}
-          disabled={loading}
+          disabled={loggingIn}
           success={loggedIn}
         />
       </div>

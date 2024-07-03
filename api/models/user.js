@@ -17,6 +17,8 @@ const UserSchema = new Schema(
     },
     image: {
       type: String,
+      default:
+        "https://cdn-icons-png.freepik.com/256/149/149071.png?semt=ais_hybrid",
     },
   },
   { timestamps: true }
