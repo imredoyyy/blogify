@@ -11,12 +11,15 @@ import { Container } from "../components/container";
 import AuthForm from "../components/auth-form";
 import { toast } from "sonner";
 import { useIsAuthenticated } from "../utils/is-authenticated";
+import { useDocumentTitle } from "../utils/use-document-title";
 
 const SignIn = () => {
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState(false);
   const [loggingIn, setLoggingIn] = useState(false);
   const dispatch = useDispatch();
+
+  useDocumentTitle("Sign In | Blogify");
 
   const handleFormSubmit = async (data) => {
     dispatch(signInStart());

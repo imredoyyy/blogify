@@ -5,12 +5,15 @@ import { Navigate, useNavigate } from "react-router-dom";
 import AuthForm from "../components/auth-form";
 import { Container } from "../components/container";
 import { useIsAuthenticated } from "../utils/is-authenticated";
+import { useDocumentTitle } from "../utils/use-document-title";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [accountCreating, setAccountCreating] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
   const isAuthenticated = useIsAuthenticated();
+
+  useDocumentTitle("Sign Up | Blogify");
 
   // If user is logged in redirect them to home page
   if (isAuthenticated) return <Navigate to="/" />;

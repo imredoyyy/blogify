@@ -2,8 +2,9 @@ import { NavLink, useLocation } from "react-router-dom";
 
 import { Button } from "./ui/button";
 import { cn } from "../lib/utils";
+import React from "react";
 
-export const NavButton = ({ href, label }) => {
+export const NavButton = ({ href, label, icon, className }) => {
   const { pathname } = useLocation();
 
   const isActive = pathname === href;
@@ -14,11 +15,20 @@ export const NavButton = ({ href, label }) => {
       size="sm"
       variant="outline"
       className={cn(
-        "border-none bg-transparent outline-none transition md:text-base",
-        !isActive && "text-muted-foreground",
+        "w-full border-none bg-transparent outline-none transition hover:bg-muted-foreground/30 md:text-base",
+        isActive ? "bg-muted-foreground/30" : "text-muted-foreground",
+        icon && "gap-3",
+        className,
       )}
     >
-      <NavLink to={href}>{label}</NavLink>
+      <NavLink to={href}>
+        {icon && (
+          <span className="[&>svg]:size-[22px]">
+            {React.createElement(icon)}
+          </span>
+        )}{" "}
+        {label}
+      </NavLink>
     </Button>
   );
 };

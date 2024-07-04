@@ -28,7 +28,7 @@ export const Navbar = () => {
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen} variant="left">
         <SheetTrigger>
-          <Button variant="outline" size="sm" className="border-none">
+          <Button variant="outline" size="icon" className="border-none">
             <Menu className="size-5" />
           </Button>
         </SheetTrigger>
