@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -7,6 +7,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import { updateUser } from "../redux/user/user-slice";
 
 import { app } from "../firebase";
 
@@ -25,6 +26,9 @@ export const UpdateUserInfoForm = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
+  const dispatch = useDispatch();
+
+  const userId = currentUser?._id;
 
   const form = useForm({
     defaultValues: {
@@ -63,6 +67,9 @@ export const UpdateUserInfoForm = () => {
       formData.append("username", data.username);
       formData.append("email", data.email);
 
+      let imageUrl = null;
+
+      // Upload image if it exists
       if (data.image) {
         const uploadImage = async () => {
           const storage = getStorage(app);
@@ -94,12 +101,55 @@ export const UpdateUserInfoForm = () => {
           });
         };
 
-        const imageUrl = await uploadImage();
+        imageUrl = await uploadImage();
         formData.append("image", imageUrl);
       }
 
-      console.log(data);
-      // Perform your API call with formData
+      // Check if username is between 5 and 20 characters
+      if (data.username.length < 5 || data.username.length > 20) {
+        toast.error("Username must be between 5 and 20 characters!");
+        setLoading(false);
+        return;
+      }
+
+      // Check if username contains special characters or spaces
+      const usernameRegex = /^[a-zA-Z0-9]+$/;
+
+      if (!usernameRegex.test(data.username)) {
+        toast.error("Username must not contain special characters or spaces!");
+        setLoading(false);
+        return;
+      }
+
+      const updatedData = {
+        name: data.name,
+        username: data.username,
+        email: data.email,
+        image: imageUrl,
+      };
+
+      const response = await fetch(`/api/user/update/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.message || "Something went wrong. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      const responseData = await response.json();
+
+      // Update the user in the store
+      dispatch(updateUser(responseData));
+
+      toast.success("Information updated successfully!");
+      setLoading(false);
     } catch (error) {
       console.log(error);
     } finally {
@@ -225,6 +275,9 @@ export const UpdateUserInfoForm = () => {
                       placeholder="Username"
                       disabled={loading}
                       {...field}
+                      onChange={(e) =>
+                        field.onChange(e.target.value.toLowerCase())
+                      }
                       className="w-full"
                     />
                   </FormControl>
