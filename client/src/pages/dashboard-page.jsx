@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useWindowSize } from "react-use";
 
@@ -7,9 +7,11 @@ import { Sidebar } from "../components/sidebar";
 import { useDocumentTitle } from "../utils/use-document-title";
 import { Container } from "../components/container";
 import { DashboardHeader } from "../components/dashboard-header";
+import { Dashboard } from "../components/dashboard";
 
-const Dashboard = () => {
+const DashboardPage = () => {
   const isAuthenticated = useIsAuthenticated();
+  const { pathname } = useLocation();
   const { width } = useWindowSize();
   const [isSidebarOpen, setIsSidebarOpen] = useState(width >= 1024);
   const sidebarRef = useRef(null);
@@ -47,13 +49,13 @@ const Dashboard = () => {
   if (!isAuthenticated) return <Navigate to="/sign-in" />;
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <div className="w-full lg:order-last">
+    <div className="relative flex h-screen overflow-hidden">
+      <div className="w-full overflow-y-auto overflow-x-hidden lg:order-last">
         {/* Dashboard Header */}
         <DashboardHeader onClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-        <Container className="relative flex flex-col overflow-y-auto overflow-x-hidden pt-4">
-          <div className="">Dashboard</div>
+        <Container className="relative flex flex-col pt-4">
+          {pathname === "/dashboard" && <Dashboard />}
           {/* Dashboard Content */}
           <Outlet />
         </Container>
@@ -67,4 +69,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardPage;

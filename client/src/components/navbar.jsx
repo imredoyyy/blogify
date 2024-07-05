@@ -49,7 +49,7 @@ export const Navbar = () => {
                 ),
             )}
           </nav>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between px-4">
             <p>Switch Theme</p>
             <ThemeToggle />
           </div>
