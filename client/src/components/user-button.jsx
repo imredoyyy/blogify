@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   DropdownMenu,
@@ -13,9 +13,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Settings, LogOut } from "lucide-react";
 import { cn } from "../lib/utils";
 import DummyProfile from "/icons/dummy-profile.png";
+import { signOut } from "../redux/user/user-slice";
 
 export const UserButton = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  const handleSignOut = () => {
+    dispatch(signOut());
+  };
 
   return (
     <DropdownMenu>
@@ -61,7 +67,7 @@ export const UserButton = () => {
           </DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="gap-2">
+        <DropdownMenuItem onClick={handleSignOut} className="gap-2">
           <LogOut className="size-4" />
           <span>Sign Out</span>
         </DropdownMenuItem>

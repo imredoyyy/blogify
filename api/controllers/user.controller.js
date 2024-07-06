@@ -20,10 +20,23 @@ export const updateUserInfo = async (req, res, next) => {
 
     const updatedFields = {};
 
-    if (req.body.currentPassword && req.body.newPassword) {
-      if (req.body.newPassword.length < 8) {
+    if (
+      req.body.currentPassword &&
+      req.body.newPassword &&
+      req.body.confirmPassword
+    ) {
+      if (
+        req.body.newPassword.length < 8 ||
+        req.body.confirmPassword.length < 8
+      ) {
         return next(
           errorHandler(400, "New password must be at least 8 characters long")
+        );
+      }
+
+      if (req.body.newPassword !== req.body.confirmPassword) {
+        return next(
+          errorHandler(400, "New password & confirm password do not match!")
         );
       }
 
@@ -36,10 +49,10 @@ export const updateUserInfo = async (req, res, next) => {
         return next(errorHandler(400, "Incorrect password"));
       }
 
-      updatedFields.password = await bcrypt.hash(req.body.newPassword, 10);
+      updatedFields.password = await bcrypt.hash(req.body.confirmPassword, 10);
     }
 
-    // Check if username contains special characters or spaces
+    // Username validation
     const usernameRegex = /^[a-zA-Z0-9]+$/;
 
     if (req.body.username) {

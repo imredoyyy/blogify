@@ -4,7 +4,6 @@ import { useWindowSize } from "react-use";
 
 import { useIsAuthenticated } from "../utils/is-authenticated";
 import { Sidebar } from "../components/sidebar";
-import { useDocumentTitle } from "../utils/use-document-title";
 import { Container } from "../components/container";
 import { DashboardHeader } from "../components/dashboard-header";
 import { Dashboard } from "../components/dashboard";
@@ -15,8 +14,6 @@ const DashboardPage = () => {
   const { width } = useWindowSize();
   const [isSidebarOpen, setIsSidebarOpen] = useState(width >= 1024);
   const sidebarRef = useRef(null);
-
-  useDocumentTitle("Dashboard | Blogify");
 
   useEffect(() => {
     if (width >= 1024) {

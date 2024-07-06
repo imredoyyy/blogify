@@ -158,7 +158,7 @@ export const UpdateUserInfoForm = () => {
   };
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex w-full flex-col gap-10">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
@@ -245,15 +245,19 @@ export const UpdateUserInfoForm = () => {
             />
           </div>
 
-          <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-6">
+          <div className="grid w-full grid-cols-1 items-center gap-5 sm:grid-cols-2 lg:gap-6">
             <FormField
               name="name"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <Label htmlFor="name" className="text-muted-foreground">
+                    Name
+                  </Label>
                   <FormControl>
                     <Input
                       type="text"
+                      id="name"
                       placeholder="Name"
                       disabled={loading}
                       {...field}
@@ -269,10 +273,14 @@ export const UpdateUserInfoForm = () => {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <Label htmlFor="username" className="text-muted-foreground">
+                    Username
+                  </Label>
                   <FormControl>
                     <Input
                       type="text"
                       placeholder="Username"
+                      id="username"
                       disabled={loading}
                       {...field}
                       onChange={(e) =>
@@ -292,9 +300,13 @@ export const UpdateUserInfoForm = () => {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <Label htmlFor="email" className="text-muted-foreground">
+                    Email
+                  </Label>
                   <FormControl>
                     <Input
                       type="email"
+                      id="email"
                       disabled={loading}
                       autoComplete="username"
                       className="w-full"
@@ -308,7 +320,7 @@ export const UpdateUserInfoForm = () => {
             <Button
               type="submit"
               disabled={loading || !form.formState.isDirty}
-              className="w-full text-sm"
+              className="mt-auto w-full text-sm"
             >
               {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
               Update Information

@@ -1,7 +1,9 @@
 import { useSelector } from "react-redux";
+import { useDocumentTitle } from "../utils/use-document-title";
 
 export const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
+  useDocumentTitle("Dashboard | Blogify");
 
   return (
     <div>
