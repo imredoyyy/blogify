@@ -14,13 +14,28 @@ import { Settings, LogOut } from "lucide-react";
 import { cn } from "../lib/utils";
 import DummyProfile from "/icons/dummy-profile.png";
 import { signOut } from "../redux/user/user-slice";
+import { toast } from "sonner";
 
 export const UserButton = () => {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const handleSignOut = () => {
-    dispatch(signOut());
+  const handleSignOut = async () => {
+    try {
+      const res = await fetch("api/user/signout", {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        toast.error("Something went wrong while signing out!");
+        return;
+      }
+
+      dispatch(signOut());
+      toast.success("Signed out successfully!");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

@@ -9,10 +9,21 @@ import { DeleteAccountPopover } from "./delete-account-popover";
 export const ProfileBottom = () => {
   const dispatch = useDispatch();
 
-  const handleSignOut = () => {
-    dispatch(signOut());
+  const handleSignOut = async () => {
+    try {
+      const res = await fetch("api/user/signout", {
+        method: "POST",
+      });
 
-    toast.success("Signed out successfully");
+      if (!res.ok) {
+        toast.error("Something went wrong while signing out!");
+      }
+
+      dispatch(signOut());
+      toast.success("Signed out successfully!");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
