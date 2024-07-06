@@ -75,7 +75,10 @@ export const signIn = async (req, res, next) => {
     }
 
     // Generate JWT
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET
+    );
 
     // Remove password from response
     const { password: userPassword, ...rest } = user._doc;

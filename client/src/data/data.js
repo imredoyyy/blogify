@@ -1,4 +1,4 @@
-import { Home, LayoutDashboard, User2, LogOut } from "lucide-react";
+import { Home, LayoutDashboard, User2, SquarePen, LogOut } from "lucide-react";
 
 export const routes = [
   {
@@ -31,6 +31,12 @@ export const dashboardNavLinks = [
     label: "Profile",
     href: "/dashboard/profile",
     icon: User2,
+  },
+  {
+    label: "Create Post",
+    href: "/create-post",
+    icon: SquarePen,
+    adminEditorOnly: true,
   },
   {
     label: "Logout",

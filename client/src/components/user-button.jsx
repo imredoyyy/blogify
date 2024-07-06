@@ -10,7 +10,7 @@ import {
 } from "./ui/dropdown-menu";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, SquarePen } from "lucide-react";
 import { cn } from "../lib/utils";
 import DummyProfile from "/icons/dummy-profile.png";
 import { signOut } from "../redux/user/user-slice";
@@ -20,9 +20,12 @@ export const UserButton = () => {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
+  const canPost =
+    currentUser?.role === "admin" || currentUser?.role === "editor";
+
   const handleSignOut = async () => {
     try {
-      const res = await fetch("api/user/signout", {
+      const res = await fetch("/api/user/signout", {
         method: "POST",
       });
 
@@ -81,6 +84,14 @@ export const UserButton = () => {
             <span>Manage Account</span>
           </DropdownMenuItem>
         </Link>
+        {canPost && (
+          <Link to="/create-post">
+            <DropdownMenuItem className="gap-2">
+              <SquarePen className="size-4" />
+              <span>Create a Post</span>
+            </DropdownMenuItem>
+          </Link>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="gap-2">
           <LogOut className="size-4" />

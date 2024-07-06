@@ -8,6 +8,7 @@ import DashboardPage from "./pages/dashboard-page";
 import SignUp from "./pages/sign-up";
 import SignIn from "./pages/sign-in";
 import Profile from "./pages/profile";
+import CreatePost from "./pages/create-post";
 
 import { Header } from "./components/header";
 import About from "./pages/about";
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/about" element={<About />} />
+        <Route path="/create-post" element={<CreatePost />} />
       </Routes>
     </ThemeProvider>
   );

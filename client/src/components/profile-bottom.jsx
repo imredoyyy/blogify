@@ -11,7 +11,7 @@ export const ProfileBottom = () => {
 
   const handleSignOut = async () => {
     try {
-      const res = await fetch("api/user/signout", {
+      const res = await fetch("/api/user/signout", {
         method: "POST",
       });
 
