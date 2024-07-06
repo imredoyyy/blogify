@@ -102,3 +102,23 @@ export const updateUserInfo = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.userId) {
+    return next(errorHandler(403, "You can only delete your own profile"));
+  }
+
+  try {
+    const user = await User.findById(req.params.userId);
+
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
+
+    await User.findByIdAndDelete(req.params.userId);
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
