@@ -1,6 +1,7 @@
 import { useDocumentTitle } from "../utils/use-document-title";
 import { UpdateUserInfoForm } from "../components/update-user-info-form";
 import { UpdateUserPasswordForm } from "../components/update-user-password-form";
+import { ProfileBottom } from "../components/profile-bottom";
 
 const Profile = () => {
   useDocumentTitle("Profile | Blogify");
@@ -11,6 +12,7 @@ const Profile = () => {
 
       <UpdateUserInfoForm />
       <UpdateUserPasswordForm />
+      <ProfileBottom />
     </div>
   );
 };

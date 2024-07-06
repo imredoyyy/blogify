@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user";
 import { errorHandler } from "../utils/error-handler";
+import { usernameExists } from "../utils/user-exists";
 
 export const test = (req, res) => {
   res.json({ message: "Testing" });
@@ -60,30 +61,41 @@ export const updateUserInfo = async (req, res, next) => {
         return next(errorHandler(400, "Username must be lowercase!"));
       }
 
-      if (req.body.username.length < 5 || req.body.username.length > 20) {
-        return next(
-          errorHandler(
-            400,
-            "Username must be between 5 and 20 characters long!"
-          )
-        );
-      }
+      try {
+        const exists = await usernameExists(req.body.username);
+        if (exists) {
+          return next(
+            errorHandler(400, "Username already exists! Use a different one!")
+          );
+        }
 
-      if (!usernameRegex.test(req.body.username)) {
-        return next(
-          errorHandler(
-            400,
-            "Username must not contain special characters or spaces!"
-          )
-        );
-      }
+        if (req.body.username.length < 5 || req.body.username.length > 20) {
+          return next(
+            errorHandler(
+              400,
+              "Username must be between 5 and 20 characters long!"
+            )
+          );
+        }
 
-      updatedFields.username = req.body.username;
+        if (!usernameRegex.test(req.body.username)) {
+          return next(
+            errorHandler(
+              400,
+              "Username must not contain special characters or spaces!"
+            )
+          );
+        }
+
+        updatedFields.username = req.body.username.trim();
+      } catch (error) {
+        return next(errorHandler(500, "Error checking username availability"));
+      }
     }
 
-    if (req.body.name) updatedFields.name = req.body.name;
-    if (req.body.email) updatedFields.email = req.body.email;
-    if (req.body.image) updatedFields.image = req.body.image;
+    if (req.body.name) updatedFields.name = req.body.name.trim();
+    if (req.body.email) updatedFields.email = req.body.email.trim();
+    if (req.body.image) updatedFields.image = req.body.image.trim();
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.userId,

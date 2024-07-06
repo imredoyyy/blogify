@@ -9,3 +9,13 @@ export const userExists = async (email) => {
 
   return true;
 };
+
+export const usernameExists = async (username) => {
+  const user = await User.findOne({ username });
+
+  if (user) {
+    return true;
+  } else {
+    return false;
+  }
+};
