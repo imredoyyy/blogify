@@ -1,16 +1,10 @@
+import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-
-import { useIsAuthenticated } from "../utils/is-authenticated";
-import { Container } from "../components/container";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Form, FormControl, FormField, FormItem } from "../components/ui/form";
-import { toast } from "sonner"; // Replace with your toast library
-import { Button } from "../components/ui/button";
+import { toast } from "sonner";
 import {
   getDownloadURL,
   getStorage,
@@ -18,9 +12,14 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
-import { useRef, useState } from "react";
+
+import { useIsAuthenticated } from "../utils/is-authenticated";
+import { Container } from "../components/container";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Form, FormControl, FormField, FormItem } from "../components/ui/form";
+import { Button } from "../components/ui/button";
 import { Camera } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -29,7 +28,6 @@ const CreatePost = () => {
   const [image, setImage] = useState(null);
   const [canUpload, setCanUpload] = useState(false);
   const [imageUploaded, setImageUploaded] = useState(false);
-  const navigate = useNavigate();
 
   const quillRef = useRef(null);
 
@@ -131,6 +129,15 @@ const CreatePost = () => {
     }
   };
 
+  const handleRemoveImage = () => {
+    if (canUpload && image) {
+      setImage(null);
+      setCanUpload(false);
+      form.setValue("image", null);
+      toast.success("Image removed successfully!");
+    }
+  };
+
   const handlePostSubmit = async (data) => {
     setLoading(true);
 
@@ -150,8 +157,13 @@ const CreatePost = () => {
       }
 
       if (data.image) {
-        setImage(await data.image);
+        setImage(data.image);
         formData.append("image", image);
+      }
+
+      if (canUpload) {
+        toast.error("You have image to upload.");
+        return;
       }
 
       const updatedFormData = {
@@ -174,6 +186,7 @@ const CreatePost = () => {
       }
 
       toast.success("Post created successfully.");
+      setImage(null);
       form.reset();
     } catch (error) {
       console.error("Error creating post: ", error);
@@ -272,7 +285,7 @@ const CreatePost = () => {
               <Button asChild className="w-full">
                 <Label htmlFor="image-upload" className="cursor-pointer">
                   <Camera className="mr-2 size-[22px]" />
-                  Upload Image
+                  Add an Image
                 </Label>
               </Button>
               <Input
@@ -302,16 +315,28 @@ const CreatePost = () => {
 
           <div className="flex h-fit max-h-[600px] w-full justify-center gap-5 transition-all duration-300">
             {image ? (
-              <div className="mx-auto mt-6 h-full max-h-[400px] w-full max-w-[450px] rounded-xl border border-muted-foreground">
-                <img
-                  src={imageUploaded ? image : URL.createObjectURL(image)}
-                  className="mx-auto max-h-[320px] max-w-[450px] rounded-xl"
-                  alt="image"
-                />
+              <div className="flex flex-col">
+                <div className="mx-auto mt-6 h-full max-h-[400px] w-full max-w-[500px] rounded-xl border border-muted-foreground p-4">
+                  <img
+                    src={imageUploaded ? image : URL.createObjectURL(image)}
+                    className="mx-auto max-h-[320px] max-w-[450px] rounded-xl"
+                    alt="image"
+                  />
+                </div>
+                {canUpload && (
+                  <Button
+                    onClick={handleRemoveImage}
+                    type="button"
+                    disabled={loading}
+                    className="mx-auto mt-5 w-full max-w-[160px]"
+                  >
+                    Remove Image
+                  </Button>
+                )}
               </div>
             ) : null}
           </div>
-          <divc className="flex flex-col gap-14">
+          <div className="flex flex-col gap-14">
             <FormField
               name="content"
               control={form.control}
@@ -382,7 +407,7 @@ const CreatePost = () => {
             <Button type="submit" className="mt-8 max-w-[160px] text-base">
               Post
             </Button>
-          </divc>
+          </div>
         </form>
       </Form>
     </Container>
