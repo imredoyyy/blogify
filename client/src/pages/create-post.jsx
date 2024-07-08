@@ -55,6 +55,33 @@ const CreatePost = () => {
     return true;
   };
 
+  const handlePostSubmit = async (data) => {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("category", data.category);
+    formData.append("content", data.content);
+
+    if (!data.title) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (!data.category) {
+      toast.error("Category is required");
+      return;
+    }
+
+    if (!data.content) {
+      toast.error("Content is required");
+      return;
+    }
+
+    const updatedFormData = {
+      ...data,
+      image: data.image || null,
+    };
+  };
+
   return (
     <Container>
       <h1 className="text-center text-xl font-medium lg:text-3xl">
@@ -62,7 +89,10 @@ const CreatePost = () => {
       </h1>
 
       <Form {...form}>
-        <form className="ring-offset-3 mx-auto flex w-full max-w-4xl flex-col gap-5 rounded-md border p-4 shadow-2xl md:p-6">
+        <form
+          onSubmit={form.handleSubmit(handlePostSubmit)}
+          className="ring-offset-3 mx-auto flex w-full max-w-4xl flex-col gap-5 rounded-md border p-4 shadow-2xl md:p-6"
+        >
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:items-center">
             <FormField
               name="title"
@@ -161,7 +191,7 @@ const CreatePost = () => {
               />
             )}
           />
-          <Button type="submit" className="mt-10 max-w-[160px] text-base">
+          <Button type="submit" className="mt-14 max-w-[160px] text-base">
             Post
           </Button>
         </form>

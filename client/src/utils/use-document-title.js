@@ -10,7 +10,6 @@ export const useDocumentTitle = (title) => {
 
     if (document.title !== title) {
       document.title = title;
-      console.log(document.title);
     }
 
     return () => {

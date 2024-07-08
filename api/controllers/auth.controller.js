@@ -4,6 +4,7 @@ import User from "../models/user";
 
 import { userExists } from "../utils/user-exists";
 import { errorHandler } from "../utils/error-handler";
+import { generateUsername } from "../utils/generate-username";
 
 export const signUp = async (req, res, next) => {
   // Get user data from request body and trim whitespace
@@ -34,10 +35,14 @@ export const signUp = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Generate username
+    const username = await generateUsername(email);
+
     // Create new user
     const newUser = await User.create({
       name,
       email,
+      username,
       password: hashedPassword,
     });
 
@@ -97,9 +102,10 @@ export const googleAuth = async (req, res, next) => {
   const { name, email, image } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
 
     if (user) {
+      // User exists, generate token and return user data
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
       const { password, ...rest } = user._doc;
       res
@@ -109,23 +115,29 @@ export const googleAuth = async (req, res, next) => {
         })
         .json(rest);
     } else {
-      const generatedPassword = Math.random().toString(36).slice(-8);
-      const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+      // Generate username
+      const username = await generateUsername(email);
 
+      // If user doesn't exist create new user
       const newUser = new User({
         name,
         email,
-        password: hashedPassword,
+        username,
         image,
+        authProvider: "google",
       });
 
       await newUser.save();
 
       const { password, ...rest } = newUser._doc;
 
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-        expiresIn: "1d",
-      });
+      const token = jwt.sign(
+        { id: newUser._id, role: user.role },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1d",
+        }
+      );
 
       res
         .status(200)

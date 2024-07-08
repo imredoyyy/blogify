@@ -82,6 +82,26 @@
   }
 }
 
+.quill {
+  border-radius: 8px;
+  border: 1px solid var(--muted-foreground);
+}
+
+.ql-toolbar.ql-snow {
+  border-radius: 6px 6px 0 -0;
+  border-color: var(--muted);
+}
+
+.ql-container.ql-snow {
+  border-radius: 0 0 6px 6px;
+  border-color: var(--muted);
+}
+
 .ql-editor {
   font-size: 1.05rem;
+  color: var(--foreground);
+}
+
+.ql-editor::placeholder {
+  color: var(--foreground);
 }

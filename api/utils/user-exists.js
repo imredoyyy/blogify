@@ -11,11 +11,10 @@ export const userExists = async (email) => {
 };
 
 export const usernameExists = async (username) => {
-  const user = await User.findOne({ username });
-
-  if (user) {
-    return true;
-  } else {
+  if (!username) {
     return false;
   }
+
+  const user = await User.findOne({ username });
+  return !!user;
 };

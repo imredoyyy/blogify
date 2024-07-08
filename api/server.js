@@ -3,20 +3,22 @@ import { connectToDb } from "./utils/connect-to-db";
 
 import userRoute from "./routes/user.route";
 import authRoute from "./routes/auth.route";
+import createPost from "./routes/post.route";
 import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
-connectToDb();
+await connectToDb();
 
 app
   .get("/", (req, res) => {
     res.send("Hello World!");
   })
   .use("/api/user", userRoute)
-  .use("/api/auth", authRoute);
+  .use("/api/auth", authRoute)
+  .use("/api/post", createPost);
 
 app.use((err, req, res, next) => {
   if (err) {

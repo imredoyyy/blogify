@@ -17,7 +17,14 @@ const UserSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return this.authProvider === "local";
+      },
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
     image: {
       type: String,
