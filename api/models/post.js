@@ -25,6 +25,9 @@ const PostSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    excerpt: {
+      type: String,
+    },
     image: {
       type: String,
     },

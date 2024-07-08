@@ -4,7 +4,7 @@ import User from "../models/user";
 import { slugExist, sanitizeSlug } from "../utils/post-utils";
 
 export const createPost = async (req, res, next) => {
-  const { title, category, slug, content } = req.body;
+  const { title, category, slug, content, excerpt, image } = req.body;
   const { id, role } = req.user;
 
   if (role !== "admin" && role !== "editor") {
@@ -37,8 +37,10 @@ export const createPost = async (req, res, next) => {
       authorName: user.name,
       title,
       category,
+      excerpt,
       slug: generatedSlug,
       content,
+      image,
     });
 
     await newPost.save();

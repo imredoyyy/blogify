@@ -99,9 +99,8 @@
 
 .ql-editor {
   font-size: 1.05rem;
-  color: var(--foreground);
 }
 
-.ql-editor::placeholder {
-  color: var(--foreground);
+.ql-editor.ql-blank::placeholder {
+  color: var(--destructive);
 }
