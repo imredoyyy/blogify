@@ -9,6 +9,9 @@ const PostSchema = new mongoose.Schema(
     authorName: {
       type: String,
     },
+    authorUsername: {
+      type: String,
+    },
     slug: {
       type: String,
       unique: true,
@@ -18,7 +21,7 @@ const PostSchema = new mongoose.Schema(
       required: true,
     },
     category: {
-      type: String,
+      type: [String],
       required: true,
     },
     content: {

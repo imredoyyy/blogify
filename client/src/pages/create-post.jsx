@@ -144,7 +144,6 @@ const CreatePost = () => {
     try {
       const formData = new FormData();
       formData.append("title", data.title.trim());
-      formData.append("category", data.category.trim());
       formData.append("slug", data.slug.trim());
       formData.append("excerpt", data.excerpt.trim());
       formData.append("content", data.content);
@@ -155,6 +154,9 @@ const CreatePost = () => {
         );
         return;
       }
+
+      const categories = data.category.split(",").map((cat) => cat.trim());
+      categories.forEach((category) => formData.append("category[]", category));
 
       if (data.image) {
         setImage(data.image);
@@ -179,7 +181,6 @@ const CreatePost = () => {
         body: JSON.stringify(updatedFormData),
       });
 
-      console.log(updatedFormData);
       if (!response.ok) {
         toast.error("Something went wrong when creating post. Try again!");
         return;
@@ -239,7 +240,7 @@ const CreatePost = () => {
                     <Input
                       type="text"
                       aria-required="true"
-                      placeholder="e.g. javascript"
+                      placeholder="e.g. javascript, react, java"
                       {...field}
                     />
                   </FormControl>

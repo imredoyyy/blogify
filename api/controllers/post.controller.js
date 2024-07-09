@@ -32,11 +32,16 @@ export const createPost = async (req, res, next) => {
       return next(errorHandler(404, "User not found"));
     }
 
+    const categories = Array.isArray(category)
+      ? category
+      : category.split(",").map((cat) => cat.trim());
+
     const newPost = new Post({
       authorId: id,
       authorName: user.name,
+      authorUsername: user.username,
       title,
-      category,
+      category: categories,
       excerpt,
       slug: generatedSlug,
       content,
@@ -46,6 +51,72 @@ export const createPost = async (req, res, next) => {
     await newPost.save();
 
     res.status(201).json({ message: "Post successful", post: newPost });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Endpoint to get posts by category
+export const getPostsByCategory = async (req, res, next) => {
+  const { category } = req.params;
+
+  try {
+    const posts = await Post.find({ category });
+    res.status(200).json(posts);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPosts = async (req, res, next) => {
+  const { slug } = req.params;
+
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+    const sortDirection = req.query.order === "ascending" ? 1 : -1;
+
+    const query = {
+      ...(req.query.userId && { userId: req.query.userId }),
+      ...(req.query.category && { category: { $in: [req.query.category] } }),
+      ...(slug && { slug: slug }),
+      ...(req.query.postId && { _id: req.query.postId }),
+      ...(req.query.searchQuery && {
+        $or: [
+          { title: { $regex: req.query.searchQuery, $options: "i" } },
+          { content: { $regex: req.query.searchQuery, $options: "i" } },
+        ],
+      }),
+    };
+
+    const posts = await Post.find(query)
+      .sort({
+        updatedAt: sortDirection,
+      })
+      .skip(startIndex)
+      .limit(limit);
+
+    const total = await Post.countDocuments(query);
+
+    const now = new Date();
+
+    const lastMonth = new Date(now);
+    lastMonth.setMonth(now.getMonth() - 1);
+
+    if (now.getMonth() === 0) {
+      lastMonth.setFullYear(now.getFullYear() - 1);
+      lastMonth.setMonth(11); // December
+    }
+
+    const lastMonthsPosts = await Post.countDocuments({
+      createdAt: { $gte: lastMonth },
+    });
+
+    res.status(200).json({
+      posts,
+      total,
+      lastMonthsPosts,
+    });
   } catch (error) {
     next(error);
   }
