@@ -38,7 +38,7 @@ const DashboardPage = () => {
 
   return (
     <div className="relative flex h-screen w-full overflow-hidden">
-      <div className="w-full overflow-hidden lg:order-last">
+      <div className="w-full overflow-y-auto lg:order-last">
         <DashboardHeader onClick={() => setIsSidebarOpen(!isSidebarOpen)} />
         <Container className="relative flex flex-col pt-4">
           {pathname === "/dashboard" && <Dashboard />}

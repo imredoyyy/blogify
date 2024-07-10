@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "../components/ui/table";
-import { Loader2 } from "lucide-react";
+import { Loader, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, Navigate, useNavigate } from "react-router-dom";
@@ -19,8 +19,10 @@ const DashPost = () => {
   const { currentUser } = useSelector((state) => state.user);
   const userId = currentUser._id;
   const [userPosts, setUserPosts] = useState([]);
-  const [totalPosts, setTotalPosts] = useState(0);
+  const [totalPosts, setTotalPosts] = useState(null);
+  const [showMore, setShowMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [loadingMorePosts, setLoadingMorePosts] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,8 +38,11 @@ const DashPost = () => {
         }
 
         const data = await res.json();
-        console.log(data);
         setUserPosts(data.posts);
+        if (data.posts.length < 10) {
+          setShowMore(false);
+        }
+        console.log(data);
         setLoading(false);
       } catch (error) {
         toast.error("Something went wrong!");
@@ -66,11 +71,42 @@ const DashPost = () => {
     );
   }
 
+  const handleShowMore = async () => {
+    const startIndex = userPosts.length;
+    setLoadingMorePosts(true);
+
+    try {
+      const res = await fetch(
+        `/api/post/get-posts?userId=${userId}&startIndex=${startIndex}`,
+      );
+      if (!res.ok) {
+        toast.error("Something went wrong!");
+        setLoadingMorePosts(false);
+        return;
+      }
+
+      const data = await res.json();
+      if (data.posts.length === 0) {
+        toast.error("No more posts available!");
+        setShowMore(false);
+      }
+
+      setUserPosts((prevPosts) => [...prevPosts, ...data.posts]);
+      if (data.posts.length < 10) {
+        setShowMore(false);
+      }
+
+      setLoadingMorePosts(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="w-full">
       {(currentUser.role === "admin" || currentUser.role === "editor") &&
       userPosts.length > 0 ? (
-        <div className="table-auto scrollbar scrollbar-track-muted scrollbar-thumb-muted-foreground">
+        <>
           <Table>
             <TableHeader>
               <TableRow>
@@ -86,12 +122,23 @@ const DashPost = () => {
             <TableBody>
               {userPosts.map((post) => (
                 <TableRow key={post._id}>
-                  <TableCell>{formatDbTime(post.updatedAt)}</TableCell>
-                  <TableCell>
-                    <Link to={`/post/${post.slug}`}>{post.title}</Link>
+                  <TableCell className="text-slate-700 dark:text-slate-300">
+                    {formatDbTime(post.updatedAt)}
                   </TableCell>
-                  <TableCell>{post.category}</TableCell>
-                  <TableCell>{post.authorName}</TableCell>
+                  <TableCell>
+                    <Link
+                      className="text-slate-700 hover:text-foreground dark:text-slate-300 dark:hover:text-accent-foreground"
+                      to={`/post/${post.slug}`}
+                    >
+                      {post.title}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-slate-700 dark:text-slate-300">
+                    {post.category}
+                  </TableCell>
+                  <TableCell className="text-slate-700 dark:text-slate-300">
+                    {post.authorName}
+                  </TableCell>
                   {(currentUser.role === "admin" ||
                     currentUser.role === "editor") && (
                     <TableCell>
@@ -112,7 +159,22 @@ const DashPost = () => {
               ))}
             </TableBody>
           </Table>
-        </div>
+
+          {showMore && (
+            <div className="mt-4 flex w-full justify-center">
+              <Button
+                onClick={handleShowMore}
+                disabled={loading}
+                className="mx-auto"
+              >
+                {loadingMorePosts && (
+                  <Loader className="mr-2 size-4 animate-spin" />
+                )}
+                Show More
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
         <div>You don&apos;t have any posts.</div>
       )}

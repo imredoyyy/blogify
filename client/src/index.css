@@ -79,7 +79,7 @@
 
   body {
     font-family: var(--poppins);
-    @apply min-h-screen bg-background text-foreground;
+    @apply min-h-screen bg-background text-foreground antialiased;
   }
 }
 
