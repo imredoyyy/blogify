@@ -76,9 +76,10 @@
   * {
     @apply border-border;
   }
+
   body {
     font-family: var(--poppins);
-    @apply bg-background text-foreground;
+    @apply min-h-screen bg-background text-foreground;
   }
 }
 

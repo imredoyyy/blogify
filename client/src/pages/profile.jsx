@@ -7,7 +7,7 @@ const Profile = () => {
   useDocumentTitle("Profile | Blogify");
 
   return (
-    <div className="max-w-3x flex w-full flex-col gap-12 lg:pl-12">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-12 lg:ml-0 lg:mr-auto lg:max-w-4xl lg:pl-12">
       <h1 className="text-xl font-medium lg:text-2xl">Profile</h1>
 
       <UpdateUserInfoForm />

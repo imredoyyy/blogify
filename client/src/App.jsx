@@ -14,11 +14,13 @@ import Post from "./pages/post";
 
 import { Header } from "./components/header";
 import About from "./pages/about";
+import { OfflineToast } from "./components/offline-toast";
 
 const App = () => {
   return (
     <ThemeProvider>
       <Toaster />
+      <OfflineToast />
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />

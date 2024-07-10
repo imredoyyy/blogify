@@ -1,6 +1,5 @@
 import { forwardRef } from "react";
 import { Link } from "react-router-dom";
-
 import { Button } from "./ui/button";
 import { cn } from "../lib/utils";
 import { X } from "lucide-react";
@@ -11,7 +10,7 @@ export const Sidebar = forwardRef(({ isSidebarOpen, onClose }, ref) => {
     <aside
       ref={ref}
       className={cn(
-        "absolute left-0 top-0 z-30 flex h-screen w-[18rem] -translate-x-full flex-col overflow-y-hidden bg-muted p-4 duration-300 ease-linear lg:static lg:z-10 lg:translate-x-0",
+        "absolute left-0 top-0 z-30 flex h-screen w-[18rem] -translate-x-full flex-col overflow-hidden bg-muted p-4 duration-300 ease-linear lg:static lg:z-10 lg:translate-x-0",
         isSidebarOpen && "translate-x-0",
       )}
     >

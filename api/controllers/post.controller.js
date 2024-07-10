@@ -56,18 +56,6 @@ export const createPost = async (req, res, next) => {
   }
 };
 
-// Endpoint to get posts by category
-export const getPostsByCategory = async (req, res, next) => {
-  const { category } = req.params;
-
-  try {
-    const posts = await Post.find({ category });
-    res.status(200).json(posts);
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const getPosts = async (req, res, next) => {
   const { slug } = req.params;
 
@@ -77,7 +65,7 @@ export const getPosts = async (req, res, next) => {
     const sortDirection = req.query.order === "ascending" ? 1 : -1;
 
     const query = {
-      ...(req.query.userId && { userId: req.query.userId }),
+      ...(req.query.userId && { authorId: req.query.userId }),
       ...(req.query.category && { category: { $in: [req.query.category] } }),
       ...(slug && { slug: slug }),
       ...(req.query.postId && { _id: req.query.postId }),
@@ -103,6 +91,7 @@ export const getPosts = async (req, res, next) => {
     const lastMonth = new Date(now);
     lastMonth.setMonth(now.getMonth() - 1);
 
+    // If the last month is January, set the year to the previous year
     if (now.getMonth() === 0) {
       lastMonth.setFullYear(now.getFullYear() - 1);
       lastMonth.setMonth(11); // December
