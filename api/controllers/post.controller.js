@@ -110,3 +110,38 @@ export const getPosts = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deletePost = async (req, res, next) => {
+  // Get user id and post id from params
+  const { userId, postId } = req.params;
+
+  try {
+    // Check if user exists
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
+
+    // Check if user is admin
+    if (user.role !== "admin") {
+      return next(
+        errorHandler(403, "You do not have privilege to delete a post!")
+      );
+    }
+
+    // Check if post exists
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return next(errorHandler(404, "Post not found"));
+    }
+
+    // Delete post
+    await Post.findByIdAndDelete(postId);
+
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

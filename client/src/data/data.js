@@ -41,7 +41,7 @@ export const dashboardNavLinks = [
   },
   {
     label: "Posts",
-    href: "/dashboard/dashboard-posts",
+    href: "/dashboard/my-posts",
     icon: FileText,
     adminEditorOnly: true,
   },
