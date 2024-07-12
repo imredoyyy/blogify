@@ -295,7 +295,7 @@ const DeletePostPopover = ({ postId, onDelete, deletingPostId }) => {
             </p>
             <div className="flex flex-col gap-2">
               <Button variant="destructive" onClick={() => onDelete(postId)}>
-                {deletingPostId ? (
+                {deletingPostId === postId ? (
                   <Loader2 className="mr-2 size-4 animate-spin" />
                 ) : (
                   <Trash2 className="mr-2 size-5" />

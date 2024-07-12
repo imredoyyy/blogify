@@ -145,3 +145,91 @@ export const signOut = (req, res, next) => {
     next(error);
   }
 };
+
+export const getUsers = async (req, res, next) => {
+  const { userId } = req.params;
+
+  if (req.user.id !== userId) {
+    return next(
+      errorHandler(403, "You don't have privilege to see all users.")
+    );
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return next(errorHandler(404, "User not found"));
+
+    const isAdmin = (await user.role) === "admin";
+
+    if (!isAdmin) {
+      return next(
+        errorHandler(403, "You don't have privilege to see all users.")
+      );
+    }
+
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+    const sortDirection = req.query.order === "ascending" ? 1 : -1;
+
+    const query = await User.find()
+      .sort({ createdAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+
+    const allUsers = query.map((user) => {
+      const { password, ...rest } = user._doc;
+
+      return rest;
+    });
+
+    const totalUsers = await User.countDocuments();
+
+    const now = new Date();
+
+    const lastMonth = new Date(now);
+    lastMonth.setMonth(now.getMonth() - 1);
+
+    // If the last month is January, set the year to the previous year
+    if (now.getMonth() === 0) {
+      lastMonth.setFullYear(now.getFullYear() - 1);
+      lastMonth.setMonth(11); // December
+    }
+
+    const lastMonthUsers = await User.find({
+      createdAt: { $gte: lastMonth },
+    });
+
+    res.status(200).json({
+      users: allUsers,
+      totalUsers,
+      lastMonthUsers,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteOtherUser = async (req, res, next) => {
+  const { userId } = req.params;
+  const { id } = req.user;
+
+  try {
+    const isAdmin = (await User.findById(id)).role === "admin";
+
+    if (!isAdmin) {
+      return next(errorHandler(403, "Only admin can perform this action."));
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

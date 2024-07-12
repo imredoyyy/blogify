@@ -81,6 +81,18 @@
     font-family: var(--poppins);
     @apply min-h-screen bg-background text-foreground antialiased;
   }
+
+  .user::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .user::-webkit-scrollbar-thumb {
+    @apply rounded-3xl bg-gray-700 dark:bg-gray-400;
+  }
+
+  .user::-webkit-scrollbar-track {
+    @apply bg-gray-400 dark:bg-gray-700;
+  }
 }
 
 .quill {
