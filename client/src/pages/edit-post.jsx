@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -19,18 +19,20 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Form, FormControl, FormField, FormItem } from "../components/ui/form";
 import { Button } from "../components/ui/button";
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
+import { quillFormats, quillModules } from "../data/quill-config";
 
-const CreatePost = () => {
+const EditPost = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [image, setImage] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
   const [canUpload, setCanUpload] = useState(false);
-  const [imageUploaded, setImageUploaded] = useState(false);
-
+  const [isUpdating, setIsUpdating] = useState(false);
+  // const [imageUploaded, setImageUploaded] = useState(false);
+  const { postId } = useParams();
   const quillRef = useRef(null);
-
   const isAuthenticated = useIsAuthenticated();
 
   const form = useForm({
@@ -43,17 +45,47 @@ const CreatePost = () => {
     },
   });
 
-  if (!isAuthenticated) {
-    return <Navigate to="/sign-in" />;
-  }
+  const fetchPost = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/post/get-posts?postId=${postId}`);
 
-  if (
-    currentUser &&
-    currentUser.role !== "admin" &&
-    currentUser.role !== "editor"
-  ) {
-    return <Navigate to="/" />;
-  }
+      if (!res.ok) {
+        toast.error("Could not get post.");
+        return;
+      }
+
+      const data = await res.json();
+      console.log(data);
+
+      form.reset({
+        title: data.posts[0].title,
+        category: data.posts[0].category.join(", "),
+        slug: data.posts[0].slug,
+        excerpt: data.posts[0].excerpt,
+        image: data.posts[0].image,
+        content: data.posts[0].content,
+      });
+
+      if (data.posts[0].image) {
+        setImage(data.posts[0].image);
+      }
+
+      setLoading(false);
+    } catch (err) {
+      toast.error(err.message);
+      console.error(err);
+    }
+  }, [postId, form]);
+
+  useEffect(() => {
+    if (
+      postId &&
+      (currentUser?.role === "admin" || currentUser?.role === "editor")
+    ) {
+      setLoading(true);
+      fetchPost();
+    }
+  }, [postId, currentUser?.role, fetchPost]);
 
   const handleImageChange = (file) => {
     const maxFileSize = 2 * 1024 * 1024; // 2MB
@@ -78,6 +110,16 @@ const CreatePost = () => {
     return true;
   };
 
+  useEffect(() => {
+    return () => {
+      const currentImageUrl = form.getValues("image");
+
+      if (currentImageUrl && currentImageUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(currentImageUrl);
+      }
+    };
+  }, [form]);
+
   const uploadImage = async (imageFile) => {
     const storage = getStorage(app);
     const fileName = imageFile.name + "_" + new Date().getTime();
@@ -94,16 +136,14 @@ const CreatePost = () => {
         },
         (error) => {
           console.error(error);
-          setLoading(false);
+          setImageUploading(false);
           toast.error("Could not upload image!");
           setImageUploadProgress(null);
-          setImageUploaded(false);
           reject(error);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
             resolve(downloadUrl);
-            setImageUploaded(true);
           });
         },
       );
@@ -112,7 +152,7 @@ const CreatePost = () => {
 
   const handleImageUpload = async () => {
     if (image) {
-      setLoading(true);
+      setImageUploading(true);
       try {
         const url = await uploadImage(image);
         setImage(url);
@@ -121,7 +161,7 @@ const CreatePost = () => {
       } catch (error) {
         console.error("Error uploading image: ", error);
       } finally {
-        setLoading(false);
+        setImageUploading(false);
         setCanUpload(false);
       }
     } else {
@@ -130,16 +170,15 @@ const CreatePost = () => {
   };
 
   const handleRemoveImage = () => {
-    if (canUpload && image) {
-      setImage(null);
-      setCanUpload(false);
-      form.setValue("image", null);
-      toast.success("Image removed successfully!");
-    }
+    setImage(null);
+    setCanUpload(false);
+    form.setValue("image", null);
+    toast.success("Image removed successfully!");
   };
 
   const handlePostSubmit = async (data) => {
     setLoading(true);
+    setIsUpdating(true);
 
     try {
       const formData = new FormData();
@@ -155,14 +194,11 @@ const CreatePost = () => {
         return;
       }
 
-      if (Array.isArray(data.category)) {
-        data.category.forEach((category) =>
-          formData.append("category[]", category.trim()),
-        );
-      } else {
-        toast.error("Multiple categories must be separated by commas.");
-        return;
-      }
+      const categories = Array.isArray(data.category)
+        ? data.category
+        : data.category.split(",").map((cat) => cat.trim());
+
+      categories.forEach((category) => formData.append("category[]", category));
 
       if (data.image) {
         setImage(data.image);
@@ -179,35 +215,48 @@ const CreatePost = () => {
         image: data.image || null,
       };
 
-      const response = await fetch("api/post/create-post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `/api/post/update-post/${currentUser._id}/${postId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedFormData),
         },
-        body: JSON.stringify(updatedFormData),
-      });
+      );
 
       if (!response.ok) {
         toast.error("Something went wrong when creating post. Try again!");
         return;
       }
 
-      toast.success("Post created successfully.");
-      setImage(null);
-      form.reset();
+      fetchPost();
+      toast.success("Post updated successfully.");
     } catch (error) {
       console.error("Error creating post: ", error);
       toast.error("Could not create post!");
     } finally {
       setLoading(false);
+      setIsUpdating(false);
     }
   };
 
+  if (!isAuthenticated) {
+    return <Navigate to="/sign-in" />;
+  }
+
+  if (
+    currentUser &&
+    currentUser.role !== "admin" &&
+    currentUser.role !== "editor"
+  ) {
+    return <Navigate to="/" />;
+  }
+
   return (
     <Container>
-      <h1 className="text-center text-xl font-medium lg:text-3xl">
-        Create Post
-      </h1>
+      <h1 className="text-center text-xl font-medium lg:text-3xl">Edit Post</h1>
 
       <Form {...form}>
         <form
@@ -312,9 +361,11 @@ const CreatePost = () => {
               type="button"
               onClick={handleImageUpload}
               className="mt-auto"
-              disabled={!canUpload || loading}
+              disabled={!canUpload || loading || imageUploading}
             >
-              {imageUploadProgress && imageUploadProgress < 100
+              {imageUploadProgress &&
+              imageUploading &&
+              imageUploadProgress < 100
                 ? `Uploading: ${imageUploadProgress + "%"}`
                 : "Upload Image"}
             </Button>
@@ -325,12 +376,17 @@ const CreatePost = () => {
               <div className="flex flex-col">
                 <div className="mx-auto mt-6 h-full max-h-[400px] w-full max-w-[500px] rounded-xl border border-muted-foreground p-4">
                   <img
-                    src={imageUploaded ? image : URL.createObjectURL(image)}
+                    src={
+                      typeof image === "string"
+                        ? image
+                        : URL.createObjectURL(image)
+                    }
+                    loading="lazy"
                     className="mx-auto max-h-[320px] max-w-[450px] rounded-xl"
                     alt="image"
                   />
                 </div>
-                {canUpload && (
+                {image && (
                   <Button
                     onClick={handleRemoveImage}
                     type="button"
@@ -357,52 +413,8 @@ const CreatePost = () => {
                       ref={quillRef}
                       {...field}
                       theme="snow"
-                      modules={{
-                        toolbar: {
-                          container: [
-                            ["bold", "italic", "underline", "strike"],
-                            [{ header: [1, 2, 3, 4, 5, 6, false] }],
-                            ["blockquote", "code-block"],
-                            [
-                              { list: "ordered" },
-                              { list: "bullet" },
-                              { list: "check" },
-                            ],
-                            [{ script: "sub" }, { script: "super" }],
-                            [{ indent: "-1" }, { indent: "+1" }],
-                            [{ direction: "rtl" }],
-                            [{ size: ["small", false, "large", "huge"] }],
-                            [{ font: [] }],
-                            ["clean"],
-                            ["link"],
-                            [{ color: [] }, { background: [] }],
-                            [{ align: [] }],
-                            ["image"],
-                          ],
-                        },
-                      }}
-                      formats={[
-                        "header",
-                        "bold",
-                        "italic",
-                        "underline",
-                        "strike",
-                        "blockquote",
-                        "code-block",
-                        "list",
-                        "bullet",
-                        "check",
-                        "script",
-                        "indent",
-                        "direction",
-                        "size",
-                        "font",
-                        "link",
-                        "color",
-                        "background",
-                        "align",
-                        "image",
-                      ]}
+                      modules={quillModules}
+                      formats={quillFormats}
                       className="h-72"
                       aria-required="true"
                       placeholder="Write your post..."
@@ -411,8 +423,18 @@ const CreatePost = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="mt-8 max-w-[160px] text-base">
-              Post
+            <Button
+              type="submit"
+              disabled={isUpdating}
+              className="mt-8 max-w-[160px] text-base"
+            >
+              {isUpdating ? (
+                <>
+                  <Loader2 className="mr-2 size-5 animate-spin" /> Saving
+                </>
+              ) : (
+                "Update Post"
+              )}
             </Button>
           </div>
         </form>
@@ -421,4 +443,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default EditPost;

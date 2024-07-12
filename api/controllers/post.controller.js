@@ -145,3 +145,37 @@ export const deletePost = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updatePost = async (req, res, next) => {
+  const { userId, postId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
+
+    if (user.role !== "admin") {
+      return next(
+        errorHandler(403, "You do not have privilege to update a post!")
+      );
+    }
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return next(errorHandler(404, "Post not found"));
+    }
+
+    const updatedPost = await Post.findByIdAndUpdate(postId, req.body, {
+      new: true,
+    });
+
+    res
+      .status(200)
+      .json({ message: "Post updated successfully", post: updatedPost });
+  } catch (error) {
+    next(error);
+  }
+};

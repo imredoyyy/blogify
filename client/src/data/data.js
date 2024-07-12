@@ -4,6 +4,7 @@ import {
   User2,
   FileText,
   SquarePen,
+  Users,
   LogOut,
 } from "lucide-react";
 
@@ -50,6 +51,12 @@ export const dashboardNavLinks = [
     href: "/create-post",
     icon: SquarePen,
     adminEditorOnly: true,
+  },
+  {
+    label: "Users",
+    href: "/dashboard/users",
+    icon: Users,
+    adminOnly: true,
   },
   {
     label: "Logout",

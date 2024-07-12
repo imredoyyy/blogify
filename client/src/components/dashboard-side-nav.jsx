@@ -11,6 +11,7 @@ export const DashboardSideNav = () => {
   const { currentUser } = useSelector((state) => state.user);
   const canPost =
     currentUser?.role === "admin" || currentUser?.role === "editor";
+  const isAdmin = currentUser?.role === "admin";
 
   const handleSignOut = async () => {
     try {
@@ -28,7 +29,8 @@ export const DashboardSideNav = () => {
   return (
     <nav className="mt-5 flex flex-col gap-4 px-4 py-4 lg:mt-9 lg:px-6">
       {dashboardNavLinks.map((link, i) => {
-        if (link.adminEditorOnly && !canPost) return null;
+        if ((link.adminEditorOnly && !canPost) || (link.adminOnly && !isAdmin))
+          return null;
         return link.href ? (
           <NavButton
             key={i}

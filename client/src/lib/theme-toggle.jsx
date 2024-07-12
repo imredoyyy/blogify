@@ -9,6 +9,7 @@ export function ThemeToggle({ className }) {
 
   return (
     <Button
+    aria-label='Toggle Theme'
       variant="outline"
       size="icon"
       className={cn("border-none", className)}

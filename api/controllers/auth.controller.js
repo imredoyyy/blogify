@@ -82,7 +82,8 @@ export const signIn = async (req, res, next) => {
     // Generate JWT
     const token = jwt.sign(
       { id: user._id, role: user.role },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      { expiresIn: "365d" }
     );
 
     // Remove password from response
@@ -91,7 +92,11 @@ export const signIn = async (req, res, next) => {
     // Send response
     res
       .status(200)
-      .cookie("accessToken", token, { httpOnly: true })
+      .cookie("accessToken", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+      })
       .json({ ...rest, message: "Login successful" });
   } catch (error) {
     next(error);
@@ -112,6 +117,8 @@ export const googleAuth = async (req, res, next) => {
         .status(200)
         .cookie("accessToken", token, {
           httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 365 * 24 * 60 * 60 * 1000,
         })
         .json(rest);
     } else {
@@ -135,7 +142,7 @@ export const googleAuth = async (req, res, next) => {
         { id: newUser._id, role: user.role },
         process.env.JWT_SECRET,
         {
-          expiresIn: "1d",
+          expiresIn: "365d",
         }
       );
 
@@ -143,6 +150,8 @@ export const googleAuth = async (req, res, next) => {
         .status(200)
         .cookie("accessToken", token, {
           httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 365 * 24 * 60 * 60 * 1000,
         })
         .json(rest);
     }

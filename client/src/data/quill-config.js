@@ -1,0 +1,43 @@
+export const quillModules = {
+  toolbar: {
+    container: [
+      ["bold", "italic", "underline", "strike"],
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["blockquote", "code-block"],
+      [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+      [{ script: "sub" }, { script: "super" }],
+      [{ indent: "-1" }, { indent: "+1" }],
+      [{ direction: "rtl" }],
+      [{ size: ["small", false, "large", "huge"] }],
+      [{ font: [] }],
+      ["clean"],
+      ["link"],
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
+      ["image"],
+    ],
+  },
+};
+
+export const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "code-block",
+  "list",
+  "bullet",
+  "check",
+  "script",
+  "indent",
+  "direction",
+  "size",
+  "font",
+  "link",
+  "color",
+  "background",
+  "align",
+  "image",
+];
