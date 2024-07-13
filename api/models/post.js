@@ -20,7 +20,7 @@ const PostSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    category: {
+    categories: {
       type: [String],
       required: true,
     },
@@ -33,6 +33,9 @@ const PostSchema = new mongoose.Schema(
     },
     image: {
       type: String,
+    },
+    tags: {
+      type: [String],
     },
   },
   { timestamps: true }

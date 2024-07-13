@@ -12,6 +12,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import DOMPurify from "dompurify";
 
 import { useIsAuthenticated } from "../utils/is-authenticated";
 import { Container } from "../components/container";
@@ -21,6 +22,7 @@ import { Form, FormControl, FormField, FormItem } from "../components/ui/form";
 import { Button } from "../components/ui/button";
 import { Camera, Loader2 } from "lucide-react";
 import { quillFormats, quillModules } from "../data/quill-config";
+import CustomTooltip from "../components/custom-tooltip";
 
 const EditPost = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -30,7 +32,6 @@ const EditPost = () => {
   const [imageUploading, setImageUploading] = useState(false);
   const [canUpload, setCanUpload] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  // const [imageUploaded, setImageUploaded] = useState(false);
   const { postId } = useParams();
   const quillRef = useRef(null);
   const isAuthenticated = useIsAuthenticated();
@@ -39,6 +40,7 @@ const EditPost = () => {
     defaultValues: {
       title: "",
       category: "",
+      newCategory: "",
       slug: "",
       content: "",
       excerpt: "",
@@ -59,11 +61,14 @@ const EditPost = () => {
 
       form.reset({
         title: data.posts[0].title,
-        category: data.posts[0].category.join(", "),
+        categories: data.posts[0].categories
+          .map((category) => category)
+          .join(", "),
         slug: data.posts[0].slug,
         excerpt: data.posts[0].excerpt,
         image: data.posts[0].image,
         content: data.posts[0].content,
+        tags: data.posts[0].tags.map((tag) => tag).join(", "),
       });
 
       if (data.posts[0].image) {
@@ -181,24 +186,32 @@ const EditPost = () => {
     setIsUpdating(true);
 
     try {
+      const sanitizeContent = DOMPurify.sanitize(data.content);
+
+      const categories = data.categories
+        .trim()
+        .split(",")
+        .map((category) => category.trim());
+
+      const tags = data.tags
+        .trim()
+        .split(",")
+        .map((tag) => tag.trim());
+
       const formData = new FormData();
       formData.append("title", data.title.trim());
+      formData.append("categories[]", categories);
       formData.append("slug", data.slug.trim());
       formData.append("excerpt", data.excerpt.trim());
-      formData.append("content", data.content);
+      formData.append("content", sanitizeContent);
+      formData.append("tags[]", tags);
 
-      if (!data.title || !data.category || !data.content) {
+      if (!data.title || !data.categories || !data.content) {
         toast.error(
           "Provide all the required fields. Required fields are marked with *",
         );
         return;
       }
-
-      const categories = Array.isArray(data.category)
-        ? data.category
-        : data.category.split(",").map((cat) => cat.trim());
-
-      categories.forEach((category) => formData.append("category[]", category));
 
       if (data.image) {
         setImage(data.image);
@@ -212,7 +225,10 @@ const EditPost = () => {
 
       const updatedFormData = {
         ...data,
+        categories,
+        tags,
         image: data.image || null,
+        content: sanitizeContent,
       };
 
       const response = await fetch(
@@ -230,6 +246,7 @@ const EditPost = () => {
         toast.error("Something went wrong when creating post. Try again!");
         return;
       }
+      console.log(updatedFormData);
 
       fetchPost();
       toast.success("Post updated successfully.");
@@ -284,18 +301,19 @@ const EditPost = () => {
               )}
             />
             <FormField
-              name="category"
+              name="categories"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-sm font-normal">
-                    Category <b>*</b>
+                  <Label className="flex items-center gap-1.5 text-sm font-normal">
+                    Categories <b>*</b>{" "}
+                    <CustomTooltip text="Multiple categories should be separated by comma." />
                   </Label>
                   <FormControl>
                     <Input
                       type="text"
                       aria-required="true"
-                      placeholder="e.g. javascript, react, java"
+                      placeholder="e.g. react, node.js"
                       {...field}
                     />
                   </FormControl>
@@ -309,7 +327,10 @@ const EditPost = () => {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-sm font-normal">Slug</Label>
+                  <Label className="flex items-center gap-1.5 text-sm font-normal">
+                    Slug{" "}
+                    <CustomTooltip text="URL friendly version of the title." />
+                  </Label>
                   <FormControl>
                     <Input
                       type="text"
@@ -321,13 +342,15 @@ const EditPost = () => {
                 </FormItem>
               )}
             />
-
             <FormField
               name="excerpt"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-sm font-normal">Excerpt</Label>
+                  <Label className="flex items-center gap-1.5 text-sm font-normal">
+                    Excerpt{" "}
+                    <CustomTooltip text="Short description of the post." />
+                  </Label>
                   <FormControl>
                     <Input type="text" placeholder="Excerpt" {...field} />
                   </FormControl>
@@ -337,7 +360,26 @@ const EditPost = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:items-center md:gap-6">
-            <FormItem>
+            <FormField
+              name="tags"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="flex items-center gap-1.5 text-sm font-normal">
+                    Tags{" "}
+                    <CustomTooltip text="Multiple tags should be separated by comma" />
+                  </Label>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="e.g. react, next.js"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormItem className="mt-auto">
               <Button asChild className="w-full">
                 <Label htmlFor="image-upload" className="cursor-pointer">
                   <Camera className="mr-2 size-[22px]" />
@@ -357,18 +399,6 @@ const EditPost = () => {
                 }}
               />
             </FormItem>
-            <Button
-              type="button"
-              onClick={handleImageUpload}
-              className="mt-auto"
-              disabled={!canUpload || loading || imageUploading}
-            >
-              {imageUploadProgress &&
-              imageUploading &&
-              imageUploadProgress < 100
-                ? `Uploading: ${imageUploadProgress + "%"}`
-                : "Upload Image"}
-            </Button>
           </div>
 
           <div className="flex h-fit max-h-[600px] w-full justify-center gap-5 transition-all duration-300">
@@ -387,14 +417,28 @@ const EditPost = () => {
                   />
                 </div>
                 {image && (
-                  <Button
-                    onClick={handleRemoveImage}
-                    type="button"
-                    disabled={loading}
-                    className="mx-auto mt-5 w-full max-w-[160px]"
-                  >
-                    Remove Image
-                  </Button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 sm:justify-items-center">
+                    <Button
+                      type="button"
+                      onClick={handleImageUpload}
+                      className="mt-auto w-full max-w-[160px]"
+                      disabled={!canUpload || loading || imageUploading}
+                    >
+                      {imageUploadProgress &&
+                      imageUploading &&
+                      imageUploadProgress < 100
+                        ? `Uploading: ${imageUploadProgress + "%"}`
+                        : "Upload Image"}
+                    </Button>
+                    <Button
+                      onClick={handleRemoveImage}
+                      type="button"
+                      disabled={loading}
+                      className="mx-auto mt-5 w-full max-w-[160px]"
+                    >
+                      Remove Image
+                    </Button>
+                  </div>
                 )}
               </div>
             ) : null}

@@ -63,3 +63,10 @@ export const dashboardNavLinks = [
     icon: LogOut,
   },
 ];
+
+export const defaultPostCategories = [
+  "javascript",
+  "next.js",
+  "react",
+  "node.js",
+];

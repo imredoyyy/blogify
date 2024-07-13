@@ -24,7 +24,6 @@ const DashPost = () => {
   const { currentUser } = useSelector((state) => state.user);
   const userId = currentUser._id;
   const [userPosts, setUserPosts] = useState([]);
-  const [totalPosts, setTotalPosts] = useState(null);
   const [showMore, setShowMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loadingMorePosts, setLoadingMorePosts] = useState(false);
@@ -217,13 +216,13 @@ const DashPost = () => {
                   <TableCell>
                     <Link
                       className="text-slate-700 hover:text-foreground dark:text-slate-300 dark:hover:text-accent-foreground"
-                      to={`/post/${post.slug}`}
+                      to={`/${post.slug}`}
                     >
                       {post.title}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-slate-700 dark:text-slate-300">
-                    {post.category}
+                  <TableCell className="capitalize text-slate-700 dark:text-slate-300">
+                    {post.categories.map((category) => category).join(", ")}
                   </TableCell>
                   <TableCell className="text-slate-700 dark:text-slate-300">
                     {post.authorName}

@@ -95,6 +95,34 @@
   }
 }
 
+.post-content h1 {
+  @apply text-2xl lg:text-3xl;
+}
+
+.post-content h1,
+h2,
+h3,
+h4 {
+  @apply mb-4 mt-2 font-playfair;
+}
+
+.post-content p {
+  @apply text-base font-normal text-muted-foreground;
+}
+
+.post-content a {
+  @apply text-foreground underline underline-offset-4 transition-colors duration-200 hover:text-muted-foreground;
+}
+
+.post-content ul {
+  @apply ml-8 list-disc text-base font-normal text-muted-foreground lg:ml-12;
+}
+
+.post-content code,
+pre {
+  @apply font-mono text-base font-normal;
+}
+
 .quill {
   border-radius: 8px;
   border: 1px solid var(--muted-foreground);

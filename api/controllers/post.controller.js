@@ -4,7 +4,7 @@ import User from "../models/user";
 import { slugExist, sanitizeSlug } from "../utils/post-utils";
 
 export const createPost = async (req, res, next) => {
-  const { title, category, slug, content, excerpt, image } = req.body;
+  const { title, categories, slug, content, excerpt, image, tags } = req.body;
   const { id, role } = req.user;
 
   if (role !== "admin" && role !== "editor") {
@@ -13,7 +13,7 @@ export const createPost = async (req, res, next) => {
     );
   }
 
-  if (!title || !category || !content) {
+  if (!title || !categories || !content) {
     return next(errorHandler(400, "Please provide all the required fields!"));
   }
 
@@ -32,20 +32,17 @@ export const createPost = async (req, res, next) => {
       return next(errorHandler(404, "User not found"));
     }
 
-    const categories = Array.isArray(category)
-      ? category
-      : category.split(",").map((cat) => cat.trim());
-
     const newPost = new Post({
       authorId: id,
       authorName: user.name,
       authorUsername: user.username,
       title,
-      category: categories,
+      categories,
       excerpt,
       slug: generatedSlug,
       content,
       image,
+      tags,
     });
 
     await newPost.save();
@@ -57,8 +54,6 @@ export const createPost = async (req, res, next) => {
 };
 
 export const getPosts = async (req, res, next) => {
-  const { slug } = req.params;
-
   try {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 10;
@@ -67,7 +62,7 @@ export const getPosts = async (req, res, next) => {
     const query = {
       ...(req.query.userId && { authorId: req.query.userId }),
       ...(req.query.category && { category: { $in: [req.query.category] } }),
-      ...(slug && { slug: slug }),
+      ...(req.query.slug && { slug: req.query.slug }),
       ...(req.query.postId && { _id: req.query.postId }),
       ...(req.query.searchQuery && {
         $or: [

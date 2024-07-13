@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import DOMPurify from "dompurify";
 import { toast } from "sonner";
 import {
   getDownloadURL,
@@ -20,6 +21,7 @@ import { Label } from "../components/ui/label";
 import { Form, FormControl, FormField, FormItem } from "../components/ui/form";
 import { Button } from "../components/ui/button";
 import { Camera } from "lucide-react";
+import CustomTooltip from "../components/custom-tooltip";
 
 const CreatePost = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -36,10 +38,11 @@ const CreatePost = () => {
   const form = useForm({
     defaultValues: {
       title: "",
-      category: "",
+      categories: "",
       slug: "",
       content: "",
       excerpt: "",
+      tags: "",
     },
   });
 
@@ -142,25 +145,30 @@ const CreatePost = () => {
     setLoading(true);
 
     try {
+      const sanitizeContent = DOMPurify.sanitize(data.content);
+
+      const categories = data.categories
+        .trim()
+        .split(",")
+        .map((category) => category.trim());
+
+      const tags = data.tags
+        .trim()
+        .split(",")
+        .map((tag) => tag.trim());
+
       const formData = new FormData();
       formData.append("title", data.title.trim());
+      formData.append("categories[]", categories);
       formData.append("slug", data.slug.trim());
       formData.append("excerpt", data.excerpt.trim());
-      formData.append("content", data.content);
+      formData.append("content", sanitizeContent);
+      formData.append("tags[]", tags);
 
-      if (!data.title || !data.category || !data.content) {
+      if (!data.title || !data.categories || !data.content) {
         toast.error(
           "Provide all the required fields. Required fields are marked with *",
         );
-        return;
-      }
-
-      if (Array.isArray(data.category)) {
-        data.category.forEach((category) =>
-          formData.append("category[]", category.trim()),
-        );
-      } else {
-        toast.error("Multiple categories must be separated by commas.");
         return;
       }
 
@@ -176,9 +184,12 @@ const CreatePost = () => {
 
       const updatedFormData = {
         ...data,
+        categories,
+        tags,
         image: data.image || null,
+        content: sanitizeContent,
       };
-
+      console.log(updatedFormData);
       const response = await fetch("api/post/create-post", {
         method: "POST",
         headers: {
@@ -235,18 +246,19 @@ const CreatePost = () => {
               )}
             />
             <FormField
-              name="category"
+              name="categories"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-sm font-normal">
-                    Category <b>*</b>
+                  <Label className="flex items-center gap-1.5 text-sm font-normal">
+                    Categories <b>*</b>{" "}
+                    <CustomTooltip text="Multiple values should be separated by comma." />
                   </Label>
                   <FormControl>
                     <Input
                       type="text"
                       aria-required="true"
-                      placeholder="e.g. javascript, react, java"
+                      placeholder="e.g. react, node.js"
                       {...field}
                     />
                   </FormControl>
@@ -260,7 +272,10 @@ const CreatePost = () => {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-sm font-normal">Slug</Label>
+                  <Label className="flex items-center gap-1.5 text-sm font-normal">
+                    Slug{" "}
+                    <CustomTooltip text="URL friendly version of the title." />
+                  </Label>
                   <FormControl>
                     <Input
                       type="text"
@@ -272,13 +287,15 @@ const CreatePost = () => {
                 </FormItem>
               )}
             />
-
             <FormField
               name="excerpt"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-sm font-normal">Excerpt</Label>
+                  <Label className="flex items-center gap-1.5 text-sm font-normal">
+                    Excerpt{" "}
+                    <CustomTooltip text="Short description of the post." />
+                  </Label>
                   <FormControl>
                     <Input type="text" placeholder="Excerpt" {...field} />
                   </FormControl>
@@ -288,7 +305,26 @@ const CreatePost = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:items-center md:gap-6">
-            <FormItem>
+            <FormField
+              name="tags"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="flex items-center gap-1.5 text-sm font-normal">
+                    Tags{" "}
+                    <CustomTooltip text="Multiple values should be separated by comma." />
+                  </Label>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="e.g. react, next.js"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormItem className="mt-auto w-full">
               <Button asChild className="w-full">
                 <Label htmlFor="image-upload" className="cursor-pointer">
                   <Camera className="mr-2 size-[22px]" />
@@ -308,16 +344,6 @@ const CreatePost = () => {
                 }}
               />
             </FormItem>
-            <Button
-              type="button"
-              onClick={handleImageUpload}
-              className="mt-auto"
-              disabled={!canUpload || loading}
-            >
-              {imageUploadProgress && imageUploadProgress < 100
-                ? `Uploading: ${imageUploadProgress + "%"}`
-                : "Upload Image"}
-            </Button>
           </div>
 
           <div className="flex h-fit max-h-[600px] w-full justify-center gap-5 transition-all duration-300">
@@ -331,14 +357,26 @@ const CreatePost = () => {
                   />
                 </div>
                 {canUpload && (
-                  <Button
-                    onClick={handleRemoveImage}
-                    type="button"
-                    disabled={loading}
-                    className="mx-auto mt-5 w-full max-w-[160px]"
-                  >
-                    Remove Image
-                  </Button>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <Button
+                      type="button"
+                      onClick={handleImageUpload}
+                      className="mt-auto w-full max-w-[160px]"
+                      disabled={!canUpload || loading}
+                    >
+                      {imageUploadProgress && imageUploadProgress < 100
+                        ? `Uploading: ${imageUploadProgress + "%"}`
+                        : "Upload Image"}
+                    </Button>
+                    <Button
+                      onClick={handleRemoveImage}
+                      type="button"
+                      disabled={loading}
+                      className="mx-auto mt-5 w-full max-w-[160px]"
+                    >
+                      Remove Image
+                    </Button>
+                  </div>
                 )}
               </div>
             ) : null}

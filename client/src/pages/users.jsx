@@ -136,7 +136,9 @@ const Users = () => {
                 </div>
               </TableCell>
               <TableCell className="capitalize">{user.role}</TableCell>
-              <TableCell>{formatDbTime(user.createdAt)}</TableCell>
+              <TableCell className="whitespace-nowrap">
+                {formatDbTime(user.createdAt)}
+              </TableCell>
               <TableCell className="capitalize">{user.authProvider}</TableCell>
               <TableCell>
                 <DeleteUserPopover
