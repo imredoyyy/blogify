@@ -44,84 +44,81 @@ const Post = () => {
     );
   }
 
-  const articleContent = document.getElementById("article-content");
-
-  if (articleContent) {
-    const links = articleContent.querySelectorAll("a");
-
-    links.forEach((link) => {
-      link.removeAttribute("rel");
-    });
-  }
-
   return (
     <Container>
-      <PostPageBreadcrumb title={post?.title} />
-      <article
-        itemScope
-        itemType="http://schema.org/BlogPosting"
-        className="mx-auto flex max-w-3xl flex-col gap-10"
-      >
-        <div className="flex flex-col gap-3">
-          <h1
-            itemProp="headline"
-            className="text-center font-playfair text-3xl font-bold capitalize lg:text-4xl"
+      {post && (
+        <>
+          <PostPageBreadcrumb title={post?.title} />
+          <article
+            itemScope
+            itemType="http://schema.org/BlogPosting"
+            className="mx-auto flex max-w-3xl flex-col gap-10"
           >
-            {post?.title}
-          </h1>
-          <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-normal">
-            <p itemProp="author" className="text-muted-foreground">
-              By <span className="text-foreground">{post?.authorName}</span>
-            </p>
-            <Separator orientation="vertical" className="h-4" />
-            <div itemProp="articleSection" className="text-muted-foreground">
-              {post?.categories.length > 1 ? "Categories" : "Category"}:{" "}
-              {post?.categories.map((category) => (
-                <Link
-                  key={category}
-                  to={`/search?category=${category}`}
-                  className="uppercase text-foreground"
+            <div className="flex flex-col gap-3">
+              <h1
+                itemProp="headline"
+                className="text-center font-playfair text-3xl font-bold capitalize lg:text-4xl"
+              >
+                {post?.title}
+              </h1>
+              <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-normal">
+                <div itemProp="author" className="text-muted-foreground">
+                  By <span className="text-foreground">{post?.authorName}</span>
+                </div>
+                <Separator orientation="vertical" className="h-4" />
+                <div
+                  itemProp="articleSection"
+                  className="text-muted-foreground"
                 >
-                  {category}
-                </Link>
-              ))}
+                  {post?.categories.length > 1 ? "Categories" : "Category"}:{" "}
+                  {post?.categories.map((category) => (
+                    <Link
+                      key={category}
+                      to={`/search?category=${category}`}
+                      className="uppercase text-foreground"
+                    >
+                      {category}
+                    </Link>
+                  ))}
+                </div>
+                <Separator orientation="vertical" className="h-4" />
+                <div itemProp="dateModified" className="text-muted-foreground">
+                  Last modified:{" "}
+                  <span className="text-foreground">
+                    {formatDbTime(post?.updatedAt)}
+                  </span>
+                </div>
+                <Separator orientation="vertical" className="h-4" />
+                <div className="text-muted-foreground">
+                  {/* Add an estimated reading time */}
+                  {Math.round(post?.content.length / 900).toFixed(0)} Mins Read
+                </div>
+              </div>
             </div>
-            <Separator orientation="vertical" className="h-4" />
-            <div itemProp="dateModified" className="text-muted-foreground">
-              Last modified:{" "}
-              <span className="text-foreground">
-                {formatDbTime(post?.updatedAt)}
-              </span>
-            </div>
-            <Separator orientation="vertical" className="h-4" />
-            <div className="text-muted-foreground">
-              {/* Add an estimated reading time */}
-              {Math.round(post?.content.length / 900).toFixed(0)} Mins Read
-            </div>
-          </div>
-        </div>
 
-        <div itemProp="articleBody">
-          {post?.image && (
-            <div className="mx-auto my-6 h-auto w-full max-w-[650px] rounded-lg border border-border shadow-sm shadow-foreground dark:shadow-muted lg:my-10">
-              <img
-                src={post?.image}
-                alt={post?.title}
-                className="size-full rounded-lg dark:shadow-md dark:shadow-muted"
-              />
-            </div>
-          )}
+            <div itemProp="articleBody">
+              {post?.image && (
+                <div className="mx-auto my-6 h-auto w-full max-w-[650px] rounded-lg border border-border shadow-sm shadow-foreground dark:shadow-muted lg:my-10">
+                  <img
+                    src={post?.image}
+                    alt={post?.title}
+                    className="size-full rounded-lg dark:shadow-md dark:shadow-muted"
+                  />
+                </div>
+              )}
 
-          <div
-            id="article-content"
-            className="post-content"
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(post?.content),
-            }}
-          ></div>
-        </div>
-      </article>
-      <CommentSection postId={post?._id} />
+              <div
+                id="article-content"
+                className="post-content"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(post?.content),
+                }}
+              ></div>
+            </div>
+            <CommentSection postId={post?._id} />
+          </article>
+        </>
+      )}
     </Container>
   );
 };

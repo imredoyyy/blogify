@@ -19,7 +19,7 @@ export const ToolTip = ({ text, customIcon }) => {
             type="button"
             variant="outline"
             size="icon"
-            className="size-3 border-none"
+            className="grid size-3 place-items-center border-none"
           >
             {customIcon ? customIcon : <CircleHelp className="size-3" />}
           </Button>
@@ -40,7 +40,7 @@ export const PopOver = ({ text, customIcon }) => {
           type="button"
           variant="outline"
           size="icon"
-          className="size-3 border-none"
+          className="grid size-3 place-items-center border-none"
         >
           {customIcon ? customIcon : <CircleHelp className="size-3" />}
         </Button>
@@ -51,7 +51,7 @@ export const PopOver = ({ text, customIcon }) => {
 };
 
 const CustomTooltip = ({ text, customIcon }) => {
-  const isMobile = useMedia("(max-width: 1024px)");
+  const isMobile = useMedia("(max-width: 768px)");
 
   return isMobile ? (
     <PopOver text={text} customIcon={customIcon} />
