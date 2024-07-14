@@ -1,6 +1,5 @@
 import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-
 import { Link } from "react-router-dom";
 import DummyImage from "/icons/dummy-profile.png";
 import { Form, FormField, FormItem } from "./ui/form";
@@ -8,11 +7,10 @@ import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import CustomTooltip from "./custom-tooltip";
 import { Button } from "./ui/button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Comment } from "./comment";
-import { Separator } from "./ui/separator";
 
 export const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector((state) => state.user);
@@ -26,18 +24,19 @@ export const CommentSection = ({ postId }) => {
     },
   });
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const response = await fetch(`/api/comment/get-comments/${postId}`);
-        const data = await response.json();
-        setComments(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchComments();
+  const fetchComments = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/comment/get-comments/${postId}`);
+      const data = await response.json();
+      setComments(data);
+    } catch (err) {
+      console.error(err);
+    }
   }, [postId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [postId, fetchComments]);
 
   const handleCommentChange = (e) => {
     const commentLength = e.target.value.length;
@@ -68,13 +67,42 @@ export const CommentSection = ({ postId }) => {
       }
 
       const commentData = await response.json();
+
+      setComments([commentData, ...comments]);
       form.reset();
-      console.log(commentData);
       toast.success("Comment submitted successfully");
     } catch (err) {
       console.error(err);
     } finally {
       setSubmittingComment(false);
+    }
+  };
+
+  const handleCommentLike = async (commentId) => {
+    try {
+      if (!currentUser) {
+        toast.error("Please sign in to like a comment");
+        return;
+      }
+
+      const response = await fetch(`/api/comment/like-comment/${commentId}`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const data = await response.json();
+      setComments(
+        comments.map((comment) =>
+          comment._id === commentId
+            ? { ...comment, likes: data.likes, numLikes: data.numLikes }
+            : comment,
+        ),
+      );
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -160,10 +188,12 @@ export const CommentSection = ({ postId }) => {
           <div>Comments ({comments.length})</div>
           <div className="w-full space-y-4">
             {comments.map((comment) => (
-              <>
-                <Comment key={comment._id} comment={comment} />
-                <Separator />
-              </>
+              <Comment
+                key={comment._id}
+                comment={comment}
+                onLike={handleCommentLike}
+                currentUser={currentUser}
+              />
             ))}
           </div>
         </div>
