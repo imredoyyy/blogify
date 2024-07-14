@@ -8,8 +8,9 @@ import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
 import { toast } from "sonner";
+import { CustomAlertDialog } from "./custom-alert-dialog";
 
-export const Comment = ({ comment, onLike, onEdit, currentUser }) => {
+export const Comment = ({ comment, onLike, onEdit, onDelete, currentUser }) => {
   const [user, setUser] = useState({});
   const [editedContent, setEditedContent] = useState(comment.content);
   const [isEditing, setIsEditing] = useState(false);
@@ -162,12 +163,17 @@ export const Comment = ({ comment, onLike, onEdit, currentUser }) => {
                   >
                     Edit
                   </Button>
-                  <Button
-                    variant="destructive"
+                  <CustomAlertDialog
+                    onClick={() => onDelete(comment._id)}
                     className={cn("h-7 p-2 text-xs font-normal")}
-                  >
-                    Delete
-                  </Button>
+                    variant="destructive"
+                    triggerText="Delete"
+                    actionVariant="destructive"
+                    alert="Are you sure you want to delete this comment?"
+                    alertDesc="This action cannot be undone."
+                    cancel="Cancel"
+                    action="Delete"
+                  />
                 </>
               )}
             </div>

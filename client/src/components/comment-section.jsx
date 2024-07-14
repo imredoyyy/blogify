@@ -114,6 +114,29 @@ export const CommentSection = ({ postId }) => {
     );
   };
 
+  const handleCommentDelete = async (commentId) => {
+    try {
+      if (!currentUser) {
+        return;
+      }
+
+      const response = await fetch(`/api/comment/delete-comment/${commentId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        toast.error("Error deleting comment");
+        return;
+      }
+
+      setComments(comments.filter((comment) => comment._id !== commentId));
+
+      toast.success("Comment deleted successfully");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-y-5">
       {currentUser ? (
@@ -201,6 +224,7 @@ export const CommentSection = ({ postId }) => {
                 comment={comment}
                 onLike={handleCommentLike}
                 onEdit={handleEdit}
+                onDelete={handleCommentDelete}
                 currentUser={currentUser}
               />
             ))}

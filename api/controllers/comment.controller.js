@@ -75,7 +75,6 @@ export const editComment = async (req, res, next) => {
   const { commentId } = req.params;
   const { id } = req.user;
   const { content } = req.body;
-  console.log(req.user.role);
 
   try {
     const comment = await Comment.findById(commentId);
@@ -102,4 +101,33 @@ export const editComment = async (req, res, next) => {
   }
 };
 
-export const deleteComment = async (req, res, next) => {};
+export const deleteComment = async (req, res, next) => {
+  const { commentId } = req.params;
+  const { id } = req.user;
+
+  try {
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return next(errorHandler(404, "Comment not found"));
+    }
+
+    if (comment.userId !== id && req.user.role !== "admin") {
+      return next(
+        errorHandler(403, "You do not have permission to delete this comment")
+      );
+    }
+
+    await Comment.findByIdAndDelete(commentId);
+
+    if (req.user.role === "admin") {
+      console.log("Deleted by admin");
+    } else {
+      console.log("Deleted by user");
+    }
+
+    res.status(200).json({ message: "Comment deleted successfully" });
+  } catch (err) {
+    next(err);
+  }
+};
