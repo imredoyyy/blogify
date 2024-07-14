@@ -70,3 +70,36 @@ export const likeComment = async (req, res, next) => {
     next(err);
   }
 };
+
+export const editComment = async (req, res, next) => {
+  const { commentId } = req.params;
+  const { id } = req.user;
+  const { content } = req.body;
+  console.log(req.user.role);
+
+  try {
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return next(errorHandler(404, "Comment not found"));
+    }
+
+    if (comment.userId !== id && req.user.role !== "admin") {
+      return next(
+        errorHandler(403, "You do not have permission to edit this comment")
+      );
+    }
+
+    const editedComment = await Comment.findByIdAndUpdate(
+      commentId,
+      { content },
+      { new: true }
+    );
+
+    res.status(200).json(editedComment);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteComment = async (req, res, next) => {};
