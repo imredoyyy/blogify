@@ -233,3 +233,19 @@ export const deleteOtherUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getUser = async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) return next(errorHandler(404, "User not found"));
+
+    const { email, password, role, ...rest } = user._doc;
+
+    res.status(200).json(rest);
+  } catch (err) {
+    next(err);
+  }
+};

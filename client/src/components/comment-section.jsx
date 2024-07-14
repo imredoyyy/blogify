@@ -8,9 +8,11 @@ import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import CustomTooltip from "./custom-tooltip";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { Comment } from "./comment";
+import { Separator } from "./ui/separator";
 
 export const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector((state) => state.user);
@@ -23,6 +25,19 @@ export const CommentSection = ({ postId }) => {
       comment: "",
     },
   });
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await fetch(`/api/comment/get-comments/${postId}`);
+        const data = await response.json();
+        setComments(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchComments();
+  }, [postId]);
 
   const handleCommentChange = (e) => {
     const commentLength = e.target.value.length;
@@ -56,8 +71,6 @@ export const CommentSection = ({ postId }) => {
       form.reset();
       console.log(commentData);
       toast.success("Comment submitted successfully");
-
-      setComments([...comments, commentData.comment]);
     } catch (err) {
       console.error(err);
     } finally {
@@ -66,7 +79,7 @@ export const CommentSection = ({ postId }) => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col gap-y-5">
       {currentUser ? (
         <div className="flex items-center gap-2">
           <Link to="/dashboard/profile">
@@ -79,7 +92,7 @@ export const CommentSection = ({ postId }) => {
             Signed in as:{" "}
             <Link
               to="/dashboard/profile"
-              className="font-medium text-foreground"
+              className="font-medium text-foreground transition-colors hover:text-muted-foreground"
             >
               {currentUser.username
                 ? "@" + currentUser.username
@@ -142,9 +155,21 @@ export const CommentSection = ({ postId }) => {
         </Form>
       </div>
 
-      <div>
-        {comments.length > 0 ? <div></div> : <div>No comments yet.</div>}
-      </div>
+      {comments.length > 0 ? (
+        <div className="mt-4 flex flex-col gap-y-4">
+          <div>Comments ({comments.length})</div>
+          <div className="w-full space-y-4">
+            {comments.map((comment) => (
+              <>
+                <Comment key={comment._id} comment={comment} />
+                <Separator />
+              </>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div>No comments yet.</div>
+      )}
     </div>
   );
 };
