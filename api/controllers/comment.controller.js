@@ -120,12 +120,6 @@ export const deleteComment = async (req, res, next) => {
 
     await Comment.findByIdAndDelete(commentId);
 
-    if (req.user.role === "admin") {
-      console.log("Deleted by admin");
-    } else {
-      console.log("Deleted by user");
-    }
-
     res.status(200).json({ message: "Comment deleted successfully" });
   } catch (err) {
     next(err);

@@ -138,7 +138,7 @@ export const CommentSection = ({ postId }) => {
   };
 
   return (
-    <div className="flex flex-col gap-y-5">
+    <div className="flex w-full flex-col gap-y-5">
       {currentUser ? (
         <div className="flex items-center gap-2">
           <Link to="/dashboard/profile">

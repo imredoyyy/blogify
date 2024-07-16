@@ -168,7 +168,6 @@ export const Comment = ({ comment, onLike, onEdit, onDelete, currentUser }) => {
                     className={cn("h-7 p-2 text-xs font-normal")}
                     variant="destructive"
                     triggerText="Delete"
-                    actionVariant="destructive"
                     alert="Are you sure you want to delete this comment?"
                     alertDesc="This action cannot be undone."
                     cancel="Cancel"

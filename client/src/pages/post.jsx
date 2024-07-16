@@ -3,14 +3,15 @@ import { Container } from "../components/container";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { PostPageBreadcrumb } from "../components/ui/breadcrumb";
 import { Separator } from "../components/ui/separator";
 import { formatDbTime } from "../utils/format-db-time";
 import DOMPurify from "dompurify";
 import { CommentSection } from "../components/comment-section";
+import { PostCard } from "../components/post-card";
 
 const Post = () => {
   const [post, setPost] = useState(null);
+  const [recentPosts, setRecentPosts] = useState(null);
   const [loading, setLoading] = useState(false);
   const { slug } = useParams();
 
@@ -36,6 +37,26 @@ const Post = () => {
     fetchPost();
   }, [slug]);
 
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      try {
+        const res = await fetch(`/api/post/get-posts?limit=3`);
+
+        if (!res.ok) {
+          return;
+        }
+
+        const data = await res.json();
+        console.log("Recent Posts", data);
+        setRecentPosts(data.posts);
+      } catch (error) {
+        toast.error("Something went wrong");
+        console.error(error);
+      }
+    };
+    fetchRecentPosts();
+  }, []);
+
   if (loading) {
     return (
       <div className="absolute inset-0 grid place-items-center">
@@ -47,12 +68,11 @@ const Post = () => {
   return (
     <Container>
       {post && (
-        <>
-          <PostPageBreadcrumb title={post?.title} />
+        <div className="mx-auto max-w-4xl">
           <article
             itemScope
             itemType="http://schema.org/BlogPosting"
-            className="mx-auto flex max-w-3xl flex-col gap-10"
+            className="flex flex-col gap-10"
           >
             <div className="flex flex-col gap-3">
               <h1
@@ -117,7 +137,20 @@ const Post = () => {
             </div>
             <CommentSection postId={post?._id} />
           </article>
-        </>
+
+          {recentPosts.length > 0 && (
+            <div className="mt-10">
+              <h2 className="text-center text-2xl font-medium lg:text-3xl">
+                Recent Posts
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                {recentPosts.map((post) => (
+                  <PostCard key={post._id} post={post} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </Container>
   );

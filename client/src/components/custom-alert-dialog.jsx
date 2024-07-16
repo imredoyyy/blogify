@@ -21,7 +21,6 @@ export const CustomAlertDialog = ({
   action,
   onClick,
   className,
-  actionVariant,
 }) => {
   return (
     <AlertDialog>
@@ -35,9 +34,7 @@ export const CustomAlertDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancel}</AlertDialogCancel>
-          <Button asChild variant={actionVariant} onClick={onClick}>
-            <AlertDialogAction>{action}</AlertDialogAction>
-          </Button>
+          <AlertDialogAction onClick={onClick}>{action}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
