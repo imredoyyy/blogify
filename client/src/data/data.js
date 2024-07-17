@@ -35,6 +35,7 @@ export const dashboardNavLinks = [
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    adminEditorOnly: true,
   },
   {
     label: "Profile",
@@ -43,7 +44,7 @@ export const dashboardNavLinks = [
   },
   {
     label: "Posts",
-    href: "/dashboard/my-posts",
+    href: "/dashboard/posts",
     icon: FileText,
     adminEditorOnly: true,
   },

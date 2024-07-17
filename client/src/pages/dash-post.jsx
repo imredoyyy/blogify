@@ -192,6 +192,7 @@ const DashPost = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Publish Date</TableHead>
                 <TableHead>Date Modified</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Category</TableHead>
@@ -204,13 +205,14 @@ const DashPost = () => {
             <TableBody>
               {userPosts.map((post) => (
                 <TableRow key={post._id}>
+                  <TableCell>{formatDbTime(post.createdAt)}</TableCell>
                   <TableCell className="text-slate-700 dark:text-slate-300">
                     {formatDbTime(post.updatedAt)}
                   </TableCell>
                   <TableCell>
                     <Link
                       className="text-slate-700 hover:text-foreground dark:text-slate-300 dark:hover:text-accent-foreground"
-                      to={`/${post.slug}`}
+                      to={`/post/${post.slug}`}
                     >
                       {post.title}
                     </Link>

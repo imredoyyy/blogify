@@ -14,6 +14,7 @@ import Post from "./pages/post";
 import EditPost from "./pages/edit-post";
 import Users from "./pages/users";
 import DashComments from "./pages/dash-comments";
+import ErrorPage from "./pages/error-page";
 
 import { Header } from "./components/header";
 import About from "./pages/about";
@@ -28,7 +29,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<DashboardPage />}>
-          <Route path="my-posts" element={<DashPost />} />
+          <Route path="posts" element={<DashPost />} />
           <Route path="profile" element={<Profile />} />
           <Route path="users" element={<Users />} />
           <Route path="comments" element={<DashComments />} />
@@ -37,8 +38,9 @@ const App = () => {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/about" element={<About />} />
         <Route path="/create-post" element={<CreatePost />} />
-        <Route path="/:slug" element={<Post />} />
+        <Route path="/post/:slug" element={<Post />} />
         <Route path="/edit-post/:postId" element={<EditPost />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </ThemeProvider>
   );

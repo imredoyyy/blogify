@@ -88,7 +88,8 @@ const DashComments = () => {
 
       if (!res.ok) {
         setDeletingCommentId(null);
-        toast.error("Error deleting comment!");
+        const data = await res.json();
+        toast.error(data.message || "Error deleting comment");
         return;
       }
 
@@ -149,7 +150,7 @@ const DashComments = () => {
     );
   }
 
-  if (currentUser.role !== "admin") {
+  if (currentUser.role !== "admin" && currentUser.role !== "editor") {
     return <Navigate to="/" />;
   }
 
@@ -168,7 +169,7 @@ const DashComments = () => {
               <TableHead>Likes</TableHead>
               <TableHead>Post Id</TableHead>
               <TableHead>Username</TableHead>
-              <TableHead>Delete</TableHead>
+              {currentUser.role === "admin" && <TableHead>Delete</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -179,13 +180,15 @@ const DashComments = () => {
                 <TableCell>{comment.numLikes}</TableCell>
                 <TableCell>{comment.postId}</TableCell>
                 <TableCell>{"@" + comment.username}</TableCell>
-                <TableCell>
-                  <DeleteCommentPopover
-                    commentId={comment._id}
-                    onDelete={handleDeleteComment}
-                    deletingCommentId={deletingCommentId}
-                  />
-                </TableCell>
+                {currentUser.role === "admin" && (
+                  <TableCell>
+                    <DeleteCommentPopover
+                      commentId={comment._id}
+                      onDelete={handleDeleteComment}
+                      deletingCommentId={deletingCommentId}
+                    />
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
