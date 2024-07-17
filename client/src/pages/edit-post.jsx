@@ -39,11 +39,11 @@ const EditPost = () => {
   const form = useForm({
     defaultValues: {
       title: "",
-      category: "",
-      newCategory: "",
+      categories: "",
       slug: "",
       content: "",
       excerpt: "",
+      tags: "",
     },
   });
 

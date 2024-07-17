@@ -107,7 +107,9 @@ export const Comment = ({ comment, onLike, onEdit, onDelete, currentUser }) => {
               />
               <div className="grid grid-cols-1 gap-y-4 sm:max-w-[220px] sm:grid-cols-2 sm:items-center sm:gap-x-4">
                 <Button type="submit" size="sm" disabled={updatingComment}>
-                  {updatingComment && <Loader2 className="snisp mr-2 size-4" />}{" "}
+                  {updatingComment && (
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                  )}{" "}
                   Save
                 </Button>
                 <Button
@@ -148,7 +150,7 @@ export const Comment = ({ comment, onLike, onEdit, onDelete, currentUser }) => {
                       comment.likes.length > 0 && "",
                     )}
                   >
-                    {comment.likes.length}
+                    {comment.numLikes}
                     {comment.likes.length > 1 ? " Likes" : " Like"}
                   </div>
                 )}

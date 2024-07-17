@@ -13,6 +13,7 @@ import CreatePost from "./pages/create-post";
 import Post from "./pages/post";
 import EditPost from "./pages/edit-post";
 import Users from "./pages/users";
+import DashComments from "./pages/dash-comments";
 
 import { Header } from "./components/header";
 import About from "./pages/about";
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="my-posts" element={<DashPost />} />
           <Route path="profile" element={<Profile />} />
           <Route path="users" element={<Users />} />
+          <Route path="comments" element={<DashComments />} />
         </Route>
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/sign-in" element={<SignIn />} />

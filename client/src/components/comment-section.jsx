@@ -26,7 +26,7 @@ export const CommentSection = ({ postId }) => {
 
   const fetchComments = useCallback(async () => {
     try {
-      const response = await fetch(`/api/comment/get-comments/${postId}`);
+      const response = await fetch(`/api/comment/get-post-comments/${postId}`);
       const data = await response.json();
       setComments(data);
     } catch (err) {
@@ -138,7 +138,7 @@ export const CommentSection = ({ postId }) => {
   };
 
   return (
-    <div className="flex w-full flex-col gap-y-5">
+    <div id="comments" className="flex w-full flex-col gap-y-5">
       {currentUser ? (
         <div className="flex items-center gap-2">
           <Link to="/dashboard/profile">

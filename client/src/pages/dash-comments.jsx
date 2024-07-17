@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { formatDbTime } from "../utils/format-db-time";
 import { Loader2, Trash2 } from "lucide-react";
-import DummyProfile from "/icons/dummy-profile.png";
 import { Button } from "../components/ui/button";
 import {
   DropdownMenu,
@@ -22,41 +21,46 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 
-const Users = () => {
-  const [users, setUsers] = useState([]);
+const DashComments = () => {
+  const [comments, setComments] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(true);
-  const [deletingUserId, setDeletingUserId] = useState(null);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
   const [showMore, setShowMore] = useState(true);
-  const [loadingMoreUsers, setLoadingMoreUsers] = useState(false);
+  const [loadingMoreComments, setLoadingMoreComments] = useState(false);
   useDocumentTitle("Users | Blogify");
 
   useEffect(() => {
-    const getUsers = async () => {
+    const getComments = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/user/get-users/${currentUser._id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch("/api/comment/get-comments");
 
         if (!response.ok) {
-          switch (response.status) {
-            case 403:
-              toast.error("You do not have permission to perform this action");
-              break;
-            default:
-              toast.error("Error fetching users");
-              break;
-          }
+          toast.error("Error fetching comments");
           return;
         }
 
         const data = await response.json();
-        setUsers(data.users);
-        if (data.users.length < 10) {
+        const commentWithUsername = await Promise.all(
+          data.comments.map(async (comment) => {
+            const userResponse = await fetch(`/api/user/${comment.userId}`);
+
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              return {
+                ...comment,
+                username: userData.username,
+              };
+            } else {
+              return comment;
+            }
+          }),
+        );
+
+        setComments(commentWithUsername);
+
+        if (data.comments.length < 10) {
           setShowMore(false);
         }
       } catch (error) {
@@ -66,45 +70,46 @@ const Users = () => {
       }
     };
 
-    if (currentUser.role === "admin") {
-      getUsers();
+    if (currentUser.role === "admin" || currentUser.role === "editor") {
+      getComments();
     }
   }, [currentUser._id, currentUser.role]);
 
-  const handleDeleteUser = async (userId) => {
-    setDeletingUserId(userId);
+  const handleDeleteComment = async (commentId) => {
+    setDeletingCommentId(commentId);
 
     try {
-      const res = await fetch(`/api/user/delete-other-user/${userId}`, {
+      const res = await fetch(`/api/comment/delete-comment/${commentId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId }),
       });
 
       if (!res.ok) {
-        setDeletingUserId(null);
-        toast.error("Error deleting user!");
+        setDeletingCommentId(null);
+        toast.error("Error deleting comment!");
         return;
       }
 
-      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
-      toast.success("User deleted successfully!");
-      setDeletingUserId(null);
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment._id !== commentId),
+      );
+      toast.success("Comment deleted successfully!");
+      setDeletingCommentId(null);
     } catch (error) {
-      setDeletingUserId(null);
-      toast.error("Error deleting user!");
+      setDeletingCommentId(null);
+      toast.error("Error deleting comment!");
       console.error(error);
     }
   };
 
   const handleLoadMore = async () => {
-    const startIndex = users.length;
-    setLoadingMoreUsers(true);
+    const startIndex = comments.length;
+    setLoadingMoreComments(true);
     try {
       const res = await fetch(
-        `/api/user/get-users/${currentUser._id}?startIndex=${startIndex}`,
+        `/api/user/get-comments/${currentUser._id}?startIndex=${startIndex}`,
         {
           method: "GET",
           headers: {
@@ -114,25 +119,25 @@ const Users = () => {
       );
 
       if (!res.ok) {
-        toast.error("Error fetching users");
+        toast.error("Error fetching comments");
         return;
       }
 
       const data = await res.json();
 
-      if (data.users.length === 0) {
-        toast.error("No more users available");
+      if (data.comments.length === 0) {
+        toast.error("No more comments available");
         setShowMore(false);
       } else {
-        setUsers((prevUsers) => [...prevUsers, ...data.users]);
-        setShowMore(data.users.length >= 10);
+        setComments((prevComments) => [...prevComments, ...data.comments]);
+        setShowMore(data.comments.length >= 10);
       }
 
-      setLoadingMoreUsers(false);
+      setLoadingMoreComments(false);
     } catch (error) {
       toast.error("Something went wrong");
       console.error(error);
-      setLoadingMoreUsers(false);
+      setLoadingMoreComments(false);
     }
   };
 
@@ -148,49 +153,37 @@ const Users = () => {
     return <Navigate to="/" />;
   }
 
-  return (
+  return comments?.length > 0 ? (
     <div className="w-full space-y-10 pt-4">
-      <h1 className="text-center text-xl font-medium lg:text-3xl">All Users</h1>
+      <h1 className="text-center text-xl font-medium lg:text-3xl">
+        All Comments
+      </h1>
 
       <div className="w-full">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-32">Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Profile Image</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Joined</TableHead>
-              <TableHead>Auth Provider</TableHead>
+              <TableHead className="min-w-32">Date Created</TableHead>
+              <TableHead>Comment</TableHead>
+              <TableHead>Likes</TableHead>
+              <TableHead>Post Id</TableHead>
+              <TableHead>Username</TableHead>
               <TableHead>Delete</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user._id}>
-                <TableCell className="capitalize">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
+            {comments.map((comment) => (
+              <TableRow key={comment._id}>
+                <TableCell>{formatDbTime(comment.createdAt)}</TableCell>
+                <TableCell>{comment.content}</TableCell>
+                <TableCell>{comment.numLikes}</TableCell>
+                <TableCell>{comment.postId}</TableCell>
+                <TableCell>{"@" + comment.username}</TableCell>
                 <TableCell>
-                  <div className="size-10">
-                    <img
-                      src={user.image ? user.image : DummyProfile}
-                      className="size-full rounded-full object-cover"
-                      alt="profile"
-                    />
-                  </div>
-                </TableCell>
-                <TableCell className="capitalize">{user.role}</TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {formatDbTime(user.createdAt)}
-                </TableCell>
-                <TableCell className="capitalize">
-                  {user.authProvider}
-                </TableCell>
-                <TableCell>
-                  <DeleteUserPopover
-                    userId={user._id}
-                    onDelete={handleDeleteUser}
-                    deletingUserId={deletingUserId}
+                  <DeleteCommentPopover
+                    commentId={comment._id}
+                    onDelete={handleDeleteComment}
+                    deletingCommentId={deletingCommentId}
                   />
                 </TableCell>
               </TableRow>
@@ -201,10 +194,10 @@ const Users = () => {
           <div className="mt-4 flex w-full justify-center">
             <Button
               onClick={handleLoadMore}
-              disabled={loadingMoreUsers}
+              disabled={loadingMoreComments}
               className="mx-auto"
             >
-              {loadingMoreUsers && (
+              {loadingMoreComments && (
                 <Loader2 className="mr-2 size-4 animate-spin" />
               )}
               Show More
@@ -213,10 +206,12 @@ const Users = () => {
         )}
       </div>
     </div>
+  ) : (
+    <div>No comments yet</div>
   );
 };
 
-const DeleteUserPopover = ({ userId, onDelete, deletingUserId }) => {
+const DeleteCommentPopover = ({ commentId, onDelete, deletingCommentId }) => {
   const [showDeletePopover, setShowDeletePopover] = useState(false);
   return (
     <DropdownMenu>
@@ -232,11 +227,11 @@ const DeleteUserPopover = ({ userId, onDelete, deletingUserId }) => {
         <DropdownMenuContent>
           <div className="flex flex-col gap-2 p-2">
             <p className="text-center text-sm">
-              Are you sure you want <br /> to delete this user?
+              Are you sure you want <br /> to delete this comment?
             </p>
             <div className="flex flex-col gap-2">
-              <Button variant="destructive" onClick={() => onDelete(userId)}>
-                {deletingUserId ? (
+              <Button variant="destructive" onClick={() => onDelete(commentId)}>
+                {deletingCommentId ? (
                   <Loader2 className="mr-2 size-4 animate-spin" />
                 ) : (
                   <Trash2 className="mr-2 size-5" />
@@ -258,4 +253,4 @@ const DeleteUserPopover = ({ userId, onDelete, deletingUserId }) => {
   );
 };
 
-export default Users;
+export default DashComments;

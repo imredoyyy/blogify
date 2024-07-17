@@ -59,7 +59,6 @@ const DashPost = () => {
           setShowMore(false);
         }
 
-        console.log(data);
         setLoading(false);
       } catch (error) {
         toast.error("Something went wrong!");
@@ -68,10 +67,8 @@ const DashPost = () => {
       }
     };
 
-    if (currentUser.role === "admin") {
+    if (currentUser.role === "admin" || currentUser.role === "editor") {
       fetchPosts(viewingAllPosts);
-    } else if (currentUser.role === "editor") {
-      fetchPosts(false);
     }
   }, [currentUser.role, userId, viewingAllPosts]);
 
@@ -102,14 +99,10 @@ const DashPost = () => {
         setShowMore(data.posts.length >= 10);
       }
 
-      setUserPosts((prevPosts) => [...prevPosts, ...data.posts]);
-
-      if (data.posts.length < 10) {
-        setShowMore(false);
-      }
-
       setLoadingMorePosts(false);
     } catch (error) {
+      toast.error("Something went wrong!");
+      setLoadingMorePosts(false);
       console.error(error);
     }
   };
@@ -163,10 +156,11 @@ const DashPost = () => {
     <div
       className={cn(
         "w-full",
-        currentUser.role === "admin" && "space-y-10 pt-4",
+        (currentUser.role === "admin" || currentUser.role === "editor") &&
+          "space-y-10 pt-4",
       )}
     >
-      {currentUser.role === "admin" && (
+      {(currentUser.role === "admin" || currentUser.role === "editor") && (
         <div className="flex items-center justify-center gap-4">
           <Button
             onClick={() => {

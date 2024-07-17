@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   User2,
   FileText,
+  MessageCircleMore,
   SquarePen,
   Users,
   LogOut,
@@ -44,6 +45,12 @@ export const dashboardNavLinks = [
     label: "Posts",
     href: "/dashboard/my-posts",
     icon: FileText,
+    adminEditorOnly: true,
+  },
+  {
+    label: "Comments",
+    href: "/dashboard/comments",
+    icon: MessageCircleMore,
     adminEditorOnly: true,
   },
   {
