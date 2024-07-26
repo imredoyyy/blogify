@@ -43,7 +43,7 @@ const Post = () => {
     };
 
     fetchPost();
-  }, [slug]);
+  }, [slug, navigate]);
 
   useEffect(() => {
     const fetchRecentPosts = async () => {
@@ -110,7 +110,7 @@ const Post = () => {
               <article
                 itemScope
                 itemType="http://schema.org/BlogPosting"
-                className="flex flex-col gap-10"
+                className="prose dark:prose-invert prose-headings:font-playfair prose-strong:font-bold prose-h1:font-bold flex flex-col gap-10"
               >
                 <div className="flex flex-col gap-3">
                   <h1
@@ -163,7 +163,7 @@ const Post = () => {
 
                 <div itemProp="articleBody">
                   {post?.image && (
-                    <div className="mx-auto my-6 h-auto w-full max-w-[650px] rounded-lg border border-border shadow-sm shadow-foreground dark:shadow-muted lg:my-10">
+                    <div className="not-prose mx-auto my-6 h-auto w-full max-w-[650px] rounded-lg border border-border shadow-sm shadow-foreground dark:shadow-muted lg:my-10">
                       <img
                         src={post?.image}
                         alt={post?.title}
@@ -174,7 +174,6 @@ const Post = () => {
 
                   <div
                     id="article-content"
-                    className="post-content"
                     dangerouslySetInnerHTML={{
                       __html: DOMPurify.sanitize(post?.content),
                     }}
@@ -183,13 +182,13 @@ const Post = () => {
                 <CommentSection postId={post?._id} />
               </article>
 
-              {recentPosts.length > 0 && (
-                <div className="mt-10">
-                  <h2 className="text-center text-2xl font-medium lg:text-3xl">
+              {recentPosts?.length > 0 && (
+                <div className="not-prose mt-10 flex flex-col gap-10">
+                  <h2 className="text-center font-playfair text-3xl font-bold lg:text-4xl">
                     Recent Posts
                   </h2>
                   <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                    {recentPosts.map((post) => (
+                    {recentPosts?.map((post) => (
                       <PostCard key={post._id} post={post} />
                     ))}
                   </div>

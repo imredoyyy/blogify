@@ -194,7 +194,9 @@ const DashPost = () => {
               <TableRow>
                 <TableHead>Publish Date</TableHead>
                 <TableHead>Date Modified</TableHead>
-                <TableHead>Title</TableHead>
+                <TableHead className={cn("min-w-[200px] text-center")}>
+                  Title
+                </TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Author</TableHead>
                 {(currentUser.role === "admin" ||

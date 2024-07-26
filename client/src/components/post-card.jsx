@@ -18,13 +18,13 @@ export const PostCard = ({ post }) => {
           <h2 className="m-0 text-base font-semibold">{post?.title}</h2>
         </Link>
         <p
-          className="line-clamp-2 text-sm text-muted-foreground lg:line-clamp-3"
+          className="line-clamp-2 text-xs text-muted-foreground"
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(post?.content.slice(0, 120)),
           }}
         />
         <Button asChild size="sm" className="h-8 w-fit text-sm">
-          <Link to={`/${post?.slug}`}>Read More</Link>
+          <Link to={`/post/${post?.slug}`}>Read More</Link>
         </Button>
       </div>
     </div>

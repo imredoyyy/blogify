@@ -69,7 +69,7 @@ export const Comment = ({ comment, onLike, onEdit, onDelete, currentUser }) => {
 
   return (
     <>
-      <div className="flex gap-2.5">
+      <div className="not-prose flex gap-2.5">
         <Avatar className="cursor-default">
           <AvatarImage src={user?.image || DummyProfile} />
           <AvatarFallback>{user?.name?.[0]}</AvatarFallback>
