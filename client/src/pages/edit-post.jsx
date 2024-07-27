@@ -200,7 +200,9 @@ const EditPost = () => {
 
       const formData = new FormData();
       formData.append("title", data.title.trim());
-      formData.append("categories[]", categories);
+      categories.forEach((category) => {
+        formData.append("categories[]", category);
+      });
       formData.append("slug", data.slug.trim());
       formData.append("excerpt", data.excerpt.trim());
       formData.append("content", sanitizeContent);
@@ -246,7 +248,6 @@ const EditPost = () => {
         toast.error("Something went wrong when creating post. Try again!");
         return;
       }
-      console.log(updatedFormData);
 
       fetchPost();
       toast.success("Post updated successfully.");

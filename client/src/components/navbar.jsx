@@ -10,7 +10,7 @@ import { ThemeToggle } from "../lib/theme-toggle";
 import { NavButton } from "./nav-button";
 import { useIsAuthenticated } from "../utils/is-authenticated";
 
-export const Navbar = () => {
+export const Navbar = ({ currentUser }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isAuthenticated = useIsAuthenticated();
 
@@ -47,6 +47,14 @@ export const Navbar = () => {
                     {route.label}
                   </Button>
                 ),
+            )}
+            {!currentUser && (
+              <Button
+                onClick={() => handleRoute("/sign-in")}
+                className="w-full justify-start"
+              >
+                Sign In
+              </Button>
             )}
           </nav>
           <div className="flex items-center justify-between px-4">

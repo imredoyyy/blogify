@@ -159,7 +159,9 @@ const CreatePost = () => {
 
       const formData = new FormData();
       formData.append("title", data.title.trim());
-      formData.append("categories[]", categories);
+      categories.forEach((category) => {
+        formData.append("categories[]", category);
+      });
       formData.append("slug", data.slug.trim());
       formData.append("excerpt", data.excerpt.trim());
       formData.append("content", sanitizeContent);

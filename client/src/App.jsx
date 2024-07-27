@@ -14,6 +14,7 @@ import Post from "./pages/post";
 import EditPost from "./pages/edit-post";
 import Users from "./pages/users";
 import DashComments from "./pages/dash-comments";
+import SearchPage from "./pages/search-page";
 import ErrorPage from "./pages/error-page";
 
 import { Header } from "./components/header";
@@ -40,6 +41,7 @@ const App = () => {
         <Route path="/create-post" element={<CreatePost />} />
         <Route path="/post/:slug" element={<Post />} />
         <Route path="/edit-post/:postId" element={<EditPost />} />
+        <Route path="/search" element={<SearchPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </ThemeProvider>

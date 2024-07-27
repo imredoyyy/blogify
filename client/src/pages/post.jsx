@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Container } from "../components/container";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Separator } from "../components/ui/separator";
@@ -110,7 +110,7 @@ const Post = () => {
               <article
                 itemScope
                 itemType="http://schema.org/BlogPosting"
-                className="prose dark:prose-invert prose-headings:font-playfair prose-strong:font-bold prose-h1:font-bold flex flex-col gap-10"
+                className="prose flex flex-col gap-10 dark:prose-invert prose-headings:font-playfair prose-h1:font-bold prose-strong:font-bold"
               >
                 <div className="flex flex-col gap-3">
                   <h1
@@ -132,14 +132,16 @@ const Post = () => {
                       className="text-muted-foreground"
                     >
                       {post?.categories.length > 1 ? "Categories" : "Category"}:{" "}
-                      {post?.categories.map((category) => (
-                        <Link
-                          key={category}
-                          to={`/search?category=${category}`}
-                          className="uppercase text-foreground"
-                        >
-                          {category}
-                        </Link>
+                      {post?.categories.map((category, index) => (
+                        <React.Fragment key={category}>
+                          <Link
+                            to={`/search?searchQuery=${category}`}
+                            className="text-foreground"
+                          >
+                            {category}
+                          </Link>
+                          {index !== post?.categories.length - 1 && ", "}
+                        </React.Fragment>
                       ))}
                     </div>
                     <Separator orientation="vertical" className="h-4" />

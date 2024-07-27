@@ -64,17 +64,19 @@ export const getPosts = async (req, res, next) => {
         const query = {
             ...(req.query.userId && { authorId: req.query.userId }),
             ...(req.query.category && {
-                category: { $in: [req.query.category] },
+                categories: {
+                    $in: [new RegExp("^" + req.query.category + "$", "i")],
+                },
             }),
+
             ...(req.query.slug && { slug: req.query.slug }),
             ...(req.query.postId && { _id: req.query.postId }),
             ...(req.query.searchQuery && {
                 $or: [
                     { title: { $regex: req.query.searchQuery, $options: "i" } },
                     {
-                        content: {
-                            $regex: req.query.searchQuery,
-                            $options: "i",
+                        categories: {
+                            $in: [new RegExp(req.query.searchQuery, "i")],
                         },
                     },
                 ],
