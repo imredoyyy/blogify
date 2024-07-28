@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useDocumentTitle } from "../utils/use-document-title";
 
 import { Container } from "../components/container";
@@ -15,11 +15,19 @@ const SearchPage = () => {
   const [showMore, setShowMore] = useState(true);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("searchQuery");
+  console.log(searchQuery === "");
+
+  const validSearchQuery = searchQuery !== null && searchQuery.trim() !== "";
 
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
-      const res = await fetch(`/api/post/get-posts?searchQuery=${searchQuery}`);
+      const fetchWithoutQuery = `/api/post/get-posts`;
+      const fetchWithQuery = `/api/post/get-posts?searchQuery=${searchQuery}`;
+
+      const res = await fetch(
+        validSearchQuery ? fetchWithQuery : fetchWithoutQuery,
+      );
 
       if (!res.ok) {
         toast.error("Nothing found with that search term");
@@ -37,10 +45,8 @@ const SearchPage = () => {
       setLoading(false);
     };
 
-    if (searchQuery) {
-      fetchPosts();
-    }
-  }, [searchQuery]);
+    fetchPosts();
+  }, [searchQuery, validSearchQuery]);
 
   useDocumentTitle(
     searchQuery
@@ -78,7 +84,7 @@ const SearchPage = () => {
 
   if (loading) {
     return (
-      <div className="absolute inset-0 flex h-screen items-center justify-center">
+      <div className="absolute inset-0 flex h-screen items-center justify-center bg-background">
         <Loader2 className="size-7 animate-spin" />
       </div>
     );
@@ -87,19 +93,44 @@ const SearchPage = () => {
   return (
     <Container>
       <div className="mx-auto w-full max-w-4xl space-y-10">
-        {searchQuery && (
-          <div className="flex w-full items-center justify-between">
-            <div className="text-left font-playfair text-2xl font-bold lg:text-4xl">
-              Search results for "{searchQuery}"
+        {validSearchQuery && posts.length === 0 && (
+          <div className="flex flex-col gap-12">
+            <div className="flex w-full items-center justify-between">
+              <div className="text-left font-playfair text-2xl font-bold lg:text-4xl">
+                Search results for "{searchQuery}"
+              </div>
+              <div className="text-lg font-medium">
+                {posts.length} results found
+              </div>
             </div>
 
-            <div className="text-lg font-medium">
-              {posts.length > 0 && posts.length} results found
+            <div className="flex flex-col items-center gap-6">
+              <p className="text-center text-muted-foreground">
+                Try searching for something else, or
+              </p>
+              <Button asChild>
+                <Link to="/">Go Home</Link>
+              </Button>
+
+              <div className="mt-4 flex flex-col gap-5">
+                <h3>Or, try searching for one of these categories below</h3>
+                <ul className="flex flex-wrap items-center justify-center gap-4">
+                  <Button asChild variant="outline">
+                    <Link to="/search?searchQuery=javascript">JavaScript</Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link to="/search?searchQuery=react">React</Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link to="/search?searchQuery=next">Next.js</Link>
+                  </Button>
+                </ul>
+              </div>
             </div>
           </div>
         )}
 
-        {searchQuery && posts.length > 0 ? (
+        {posts.length > 0 && (
           <>
             <div className="grid w-full gap-4 sm:grid-cols-2 md:grid-cols-3 lg:gap-6">
               {posts.map((post) => (
@@ -115,12 +146,6 @@ const SearchPage = () => {
               </Button>
             )}
           </>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-center text-xl font-medium lg:text-2xl">
-            {searchQuery === null || searchQuery === ""
-              ? "No search term provided"
-              : `Nothing results found for ${searchQuery}`}
-          </div>
         )}
       </div>
     </Container>

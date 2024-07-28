@@ -16,6 +16,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Search } from "lucide-react";
+import { toast } from "sonner";
 
 export const SearchModal = () => {
   const [open, setOpen] = useState(false);
@@ -57,9 +58,16 @@ export const SearchModal = () => {
   }, []);
 
   const handleSearch = (data) => {
+    if (!data.searchTerm.trim()) {
+      toast.error("Please enter a search term");
+      setOpen(false);
+      return; // Prevent navigation if the search term is empty
+    }
+
     const urlParams = new URLSearchParams(location.search);
-    urlParams.set("searchQuery", data.searchTerm);
+    urlParams.set("searchQuery", data.searchTerm.trim());
     const searchQuery = urlParams.toString();
+
     navigate(`/search?${searchQuery}`);
     setOpen(false);
   };
