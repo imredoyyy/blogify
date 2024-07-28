@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Container } from "../components/container";
 import React, { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -9,6 +9,7 @@ import DOMPurify from "dompurify";
 import { CommentSection } from "../components/comment-section";
 import { PostCard } from "../components/post-card";
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import { SharePost } from "../components/share-post";
 
 const Post = () => {
   const [post, setPost] = useState(null);
@@ -16,6 +17,8 @@ const Post = () => {
   const [loading, setLoading] = useState(false);
   const { slug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const postUrl = `${window.location.origin}${location.pathname}${location.search}`;
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -180,6 +183,7 @@ const Post = () => {
                       __html: DOMPurify.sanitize(post?.content),
                     }}
                   ></div>
+                  <SharePost postUrl={postUrl} postTitle={post?.title} />
                 </div>
                 <CommentSection postId={post?._id} />
               </article>
