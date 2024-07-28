@@ -22,6 +22,7 @@ import { Form, FormControl, FormField, FormItem } from "../components/ui/form";
 import { Button } from "../components/ui/button";
 import { Camera } from "lucide-react";
 import CustomTooltip from "../components/custom-tooltip";
+import { quillFormats, quillModules } from "../data/quill-config";
 
 const CreatePost = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -397,52 +398,8 @@ const CreatePost = () => {
                       ref={quillRef}
                       {...field}
                       theme="snow"
-                      modules={{
-                        toolbar: {
-                          container: [
-                            ["bold", "italic", "underline", "strike"],
-                            [{ header: [1, 2, 3, 4, 5, 6, false] }],
-                            ["blockquote", "code-block"],
-                            [
-                              { list: "ordered" },
-                              { list: "bullet" },
-                              { list: "check" },
-                            ],
-                            [{ script: "sub" }, { script: "super" }],
-                            [{ indent: "-1" }, { indent: "+1" }],
-                            [{ direction: "rtl" }],
-                            [{ size: ["small", false, "large", "huge"] }],
-                            [{ font: [] }],
-                            ["clean"],
-                            ["link"],
-                            [{ color: [] }, { background: [] }],
-                            [{ align: [] }],
-                            ["image"],
-                          ],
-                        },
-                      }}
-                      formats={[
-                        "header",
-                        "bold",
-                        "italic",
-                        "underline",
-                        "strike",
-                        "blockquote",
-                        "code-block",
-                        "list",
-                        "bullet",
-                        "check",
-                        "script",
-                        "indent",
-                        "direction",
-                        "size",
-                        "font",
-                        "link",
-                        "color",
-                        "background",
-                        "align",
-                        "image",
-                      ]}
+                      modules={quillModules}
+                      formats={quillFormats}
                       className="h-72"
                       aria-required="true"
                       placeholder="Write your post..."
@@ -451,7 +408,10 @@ const CreatePost = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="mt-8 max-w-[160px] text-base">
+            <Button
+              type="submit"
+              className="md mt-16 max-w-[160px] text-base sm:mt-8"
+            >
               Post
             </Button>
           </div>

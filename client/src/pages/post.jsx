@@ -78,7 +78,7 @@ const Post = () => {
 
   if (loading) {
     return (
-      <div className="absolute inset-0 grid place-items-center">
+      <div className="absolute inset-0 grid place-items-center bg-background">
         <Loader2 className="size-8 animate-spin lg:size-10" />
       </div>
     );
@@ -189,7 +189,7 @@ const Post = () => {
                   <h2 className="text-center font-playfair text-3xl font-bold lg:text-4xl">
                     Recent Posts
                   </h2>
-                  <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                  <div className="grid place-items-center gap-4 sm:grid-cols-2 md:grid-cols-3">
                     {recentPosts?.map((post) => (
                       <PostCard key={post._id} post={post} />
                     ))}

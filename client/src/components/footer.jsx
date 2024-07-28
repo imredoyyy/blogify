@@ -12,7 +12,7 @@ export const Footer = () => {
     <>
       <Separator />
       <Container className={cn("bg-primary-foreground")}>
-        <div className="lg:space-y-10">
+        <div className="space-y-6 lg:space-y-10">
           <div className="flex flex-wrap items-center justify-center gap-4">
             {socialLinks.map((link, i) => (
               <Button

@@ -132,13 +132,17 @@ const SearchPage = () => {
 
         {posts.length > 0 && (
           <>
-            <div className="grid w-full gap-4 sm:grid-cols-2 md:grid-cols-3 lg:gap-6">
+            <div className="grid w-full place-items-center gap-4 sm:grid-cols-2 md:grid-cols-3 lg:gap-6">
               {posts.map((post) => (
                 <PostCard key={post._id} post={post} />
               ))}
             </div>
             {showMore && (
-              <Button disabled={loadingMore} onClick={handleShowMore}>
+              <Button
+                disabled={loadingMore}
+                onClick={handleShowMore}
+                className="mx-auto flex"
+              >
                 {loadingMore && (
                   <Loader2 className="mr-2 size-5 animate-spin" />
                 )}

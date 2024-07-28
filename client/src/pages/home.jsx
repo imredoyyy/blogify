@@ -56,7 +56,7 @@ const Home = () => {
                 Recent Posts
               </h2>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <div className="grid grid-cols-1 place-items-center gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {posts.map((post) => (
                   <PostCard key={post._id} post={post} />
                 ))}
@@ -70,7 +70,7 @@ const Home = () => {
                 JavaScript
               </h2>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <div className="grid grid-cols-1 place-items-center gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {posts
                   .filter((post) =>
                     post.categories.some(
