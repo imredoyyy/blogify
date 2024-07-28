@@ -20,6 +20,7 @@ import ErrorPage from "./pages/error-page";
 import { Header } from "./components/header";
 import About from "./pages/about";
 import { OfflineToast } from "./components/offline-toast";
+import { Footer } from "./components/footer";
 
 const App = () => {
   return (
@@ -44,6 +45,7 @@ const App = () => {
         <Route path="/search" element={<SearchPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
+      <Footer />
     </ThemeProvider>
   );
 };

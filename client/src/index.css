@@ -68,10 +68,6 @@
   }
 }
 
-/* body {
-  font-family: var(--poppins);
-} */
-
 @layer base {
   * {
     @apply border-border;

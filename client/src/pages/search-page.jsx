@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Container } from "../components/container";
 import { useSearchParams } from "react-router-dom";
+import { useDocumentTitle } from "../utils/use-document-title";
+
+import { Container } from "../components/container";
 import { toast } from "sonner";
 import { PostCard } from "../components/post-card";
 import { Button } from "../components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useDocumentTitle } from "../utils/use-document-title";
 
 const SearchPage = () => {
   const [posts, setPosts] = useState([]);
@@ -41,7 +42,11 @@ const SearchPage = () => {
     }
   }, [searchQuery]);
 
-  useDocumentTitle(`Search results for "${searchQuery}" | Blogify`);
+  useDocumentTitle(
+    searchQuery
+      ? `Search results for "${searchQuery}" | Blogify`
+      : "Search | Blogify",
+  );
 
   const handleShowMore = async () => {
     const startIndex = posts.length;
@@ -94,7 +99,7 @@ const SearchPage = () => {
           </div>
         )}
 
-        {posts.length > 0 ? (
+        {searchQuery && posts.length > 0 ? (
           <>
             <div className="grid w-full gap-4 sm:grid-cols-2 md:grid-cols-3 lg:gap-6">
               {posts.map((post) => (
@@ -111,7 +116,11 @@ const SearchPage = () => {
             )}
           </>
         ) : (
-          <div>No posts found for "{searchQuery}"</div>
+          <div className="flex h-full w-full items-center justify-center text-center text-xl font-medium lg:text-2xl">
+            {searchQuery === null || searchQuery === ""
+              ? "No search term provided"
+              : `Nothing results found for ${searchQuery}`}
+          </div>
         )}
       </div>
     </Container>

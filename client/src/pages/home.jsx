@@ -12,7 +12,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch("/api/post/get-posts");
+      const response = await fetch("/api/post/get-posts?limit=9");
 
       if (!response.ok) {
         setLoading(false);
@@ -29,7 +29,7 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div className="absolute inset-0 flex h-screen items-center justify-center">
+      <div className="absolute inset-0 flex h-screen items-center justify-center bg-background">
         <Loader2 className="size-7 animate-spin" />
       </div>
     );

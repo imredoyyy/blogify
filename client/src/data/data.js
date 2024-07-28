@@ -7,6 +7,10 @@ import {
   SquarePen,
   Users,
   LogOut,
+  Github,
+  Linkedin,
+  Facebook,
+  Instagram,
 } from "lucide-react";
 
 export const routes = [
@@ -77,4 +81,46 @@ export const defaultPostCategories = [
   "next.js",
   "react",
   "node.js",
+];
+
+export const socialLinks = [
+  {
+    label: "Github",
+    href: "https://github.com/imredoyyy",
+    icon: Github,
+  },
+  {
+    label: "LinkedIn",
+    href: "/",
+    icon: Linkedin,
+  },
+  {
+    label: "Facebook",
+    href: "/",
+    icon: Facebook,
+  },
+  {
+    label: "Instagram",
+    href: "/",
+    icon: Instagram,
+  },
+];
+
+export const footerLinks = [
+  {
+    label: "Home",
+    href: "/",
+  },
+  {
+    label: "About",
+    href: "/about",
+  },
+  {
+    label: "Privacy Policy",
+    href: "/",
+  },
+  {
+    label: "Contact",
+    href: "/",
+  },
 ];
