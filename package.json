@@ -4,7 +4,7 @@
     "scripts": {
         "dev": "bun --watch api/server.js",
         "start": "bun api/server.js",
-        "build": "bun install && bun install --prefix client && bun run build --prefix client"
+        "build": "bun install && bun install --prefix client && bun run --prefix client vite build"
     },
     "type": "module",
     "dependencies": {
