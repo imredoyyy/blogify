@@ -7,8 +7,12 @@ import commentRoute from "./routes/comment.route";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
@@ -16,17 +20,17 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
 await connectToDb();
 
-const __dirname = path.resolve();
-
 app.use("/api/user", userRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/post", postRoute);
 app.use("/api/comment", commentRoute);
 
-app.use(express.static(path.join(__dirname, "../client/build")));
+// Serve static files from the React app
+const buildPath = path.join(__dirname, "../client/dist");
+app.use(express.static(buildPath));
 
 app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/build/index.html"));
+    res.sendFile(path.join(buildPath, "index.html"));
 });
 
 app.use((err, req, res, next) => {
